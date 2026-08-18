@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>부모만족도 조사</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#1a3a5c; --cream:#faf7f0; --gold:#c89b4a; --gold-d:#a8842f;
+    --line:#e7e0d3; --ink:#2c2c2c; --muted:#7a7268; --ok:#3f7d4f;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Noto Sans KR',sans-serif;background:var(--cream);color:var(--ink);line-height:1.6;padding-bottom:60px}
+  .wrap{max-width:780px;margin:0 auto;padding:0 16px}
+
+  header{background:linear-gradient(135deg,#1a3a5c,#21496f);color:#fff;padding:28px 0 24px;margin-bottom:20px}
+  header .brand{color:var(--gold);font-size:12.5px;font-weight:700;letter-spacing:.04em;margin-bottom:6px}
+  header h1{font-family:'Noto Serif KR',serif;font-size:24px;font-weight:700}
+  header p{font-size:13.5px;color:#d3e0ee;margin-top:8px}
+
+  .pbar{height:8px;background:#eadfca;border-radius:6px;overflow:hidden;margin-bottom:18px}
+  .pbar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),#dab36a);width:0;transition:width .35s}
+
+  .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px 20px;box-shadow:0 3px 14px rgba(26,58,92,.05);margin-bottom:18px}
+  h2{font-family:'Noto Serif KR',serif;color:var(--navy);font-size:20px;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+  .step-num{background:var(--gold);color:#fff;width:30px;height:30px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex:none}
+  .lead{color:var(--muted);font-size:14px;margin-bottom:18px}
+
+  .notice{background:#f3f7fb;border-radius:12px;padding:15px 17px;font-size:13.5px;line-height:1.85;margin-bottom:18px}
+  .notice b{color:var(--navy)}
+  .orgbanner{background:#fdf8ef;border:1px solid #efdfc0;border-radius:10px;padding:12px 14px;font-size:14.5px;color:var(--navy);margin-bottom:16px}
+  .orgbanner b{color:var(--gold-d)}
+
+  .field{margin-bottom:14px}
+  .field label{display:block;font-size:13px;font-weight:700;color:var(--navy);margin-bottom:6px}
+  .field input,.field textarea{width:100%;padding:11px 13px;border:1.5px solid var(--line);border-radius:10px;font-size:14px;font-family:inherit;background:#fff}
+  .field textarea{min-height:84px;resize:vertical;line-height:1.6}
+  .field input:focus,.field textarea:focus{outline:none;border-color:var(--gold)}
+  .field .hint{font-size:12px;color:var(--muted);margin-top:5px;line-height:1.5}
+
+  /* 선택 칩 */
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:9px 16px;font-size:14px;font-family:inherit;cursor:pointer;color:var(--muted);transition:.12s}
+  .chip.on{border-color:var(--gold);background:#fdf8ef;color:var(--gold-d);font-weight:700}
+
+  /* 문항 */
+  .qcount{position:sticky;top:0;z-index:5;background:var(--cream);padding:10px 0;font-size:13px;color:var(--navy);font-weight:700;display:flex;justify-content:space-between;align-items:center;margin:0 -20px;padding-left:20px;padding-right:20px}
+  .qcount .done{color:var(--gold-d)}
+  .areahead{font-family:'Noto Serif KR',serif;font-size:16px;color:#fff;border-radius:10px;padding:9px 14px;margin:22px 0 12px;font-weight:700}
+  .q{border:1px solid var(--line);border-radius:14px;padding:15px 14px 13px;margin-bottom:12px;background:#fff}
+  .q.unanswered{border-left:4px solid #e9c98a}
+  .q.answered{border-left:4px solid var(--ok)}
+  .q .qnote{background:#f7f5f0;border-radius:9px;padding:9px 12px;font-size:12.5px;color:#7a7268;line-height:1.7;margin-bottom:11px}
+  .q .qhead{display:flex;gap:9px;margin-bottom:12px}
+  .q .qno{flex:none;width:25px;height:25px;border-radius:50%;background:var(--navy);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:2px}
+  .q .qtext{font-size:14.5px;font-weight:500;line-height:1.55}
+  .scale{display:flex;gap:5px}
+  .opt{flex:1;min-width:0}
+  .opt input{display:none}
+  .opt label{display:block;text-align:center;border:1.5px solid var(--line);border-radius:10px;padding:8px 2px;font-size:11px;line-height:1.25;cursor:pointer;transition:.12s;color:var(--muted);height:100%}
+  .opt label b{display:block;font-size:14px;color:var(--ink);margin-bottom:2px}
+  .opt input:checked + label{border-color:var(--ok);background:#eef6ea;color:var(--ok);font-weight:700}
+  .opt input:checked + label b{color:var(--ok)}
+
+  .row{display:flex;justify-content:space-between;gap:10px;margin-top:16px}
+  button.nav{font-family:inherit;font-size:15px;font-weight:700;padding:13px 22px;border-radius:12px;cursor:pointer;border:none}
+  .btn-prev{background:#fff;border:1.5px solid var(--line);color:var(--muted)}
+  .btn-next{background:var(--navy);color:#fff}
+  .btn-next:disabled{background:#b9c4d0;cursor:not-allowed}
+  .btn-main{background:var(--gold);color:#fff;width:100%;font-size:16px;padding:16px;border-radius:12px;font-weight:700;border:none;cursor:pointer;font-family:inherit}
+  .btn-main:hover{background:var(--gold-d)}
+  .btn-main:disabled{background:#cdc3b2;cursor:not-allowed}
+  .btn-sub{background:#fff;border:1.5px solid var(--navy);color:var(--navy);width:100%;font-size:14.5px;padding:13px;border-radius:12px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px}
+  .btn-sub:hover{background:#f3f7fb}
+
+  .done-wrap{text-align:center;padding:10px 0}
+  .done-wrap .big{font-size:46px}
+  .done-wrap h2{justify-content:center;margin:10px 0}
+  .status{margin-top:14px;font-size:13.5px;text-align:center;color:var(--muted);line-height:1.7}
+  .err{background:#fdecec;color:#9a4a4a;border-radius:10px;padding:11px 14px;font-size:13px;margin-top:12px;line-height:1.6}
+  .okbox{background:#eef6ea;color:#2f6b40;border-radius:10px;padding:12px 14px;font-size:13.5px;margin-top:12px;line-height:1.7}
+
+  .consent{display:flex;gap:8px;align-items:flex-start;text-align:left;background:#f3f7fb;border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.55;margin-bottom:14px;cursor:pointer}
+  .consent input{margin-top:3px;flex:none;width:18px;height:18px}
+
+  .linkbox{margin-top:14px;background:#fdf8ef;border:1px solid #efdfc0;border-radius:12px;padding:14px}
+  .linkbox .ll{font-weight:700;color:var(--gold-d);margin-bottom:8px}
+  .linkbox input{width:100%;padding:10px;border:1.5px solid var(--line);border-radius:8px;font-size:12px;background:#fff}
+  .linkbox .lrow{display:flex;gap:8px;margin-top:8px}
+  .linkbox .lrow .btn-sub{margin:0;flex:1}
+  .linkbox .lprev{text-decoration:none;text-align:center;display:flex;align-items:center;justify-content:center}
+  .linkbox .lnote{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.6}
+  .msgbox{margin-top:10px;background:#fff;border:1px dashed var(--line);border-radius:10px;padding:12px;font-size:13px;line-height:1.7;white-space:pre-wrap}
+
+  .overlay{position:fixed;inset:0;background:rgba(26,58,92,.55);z-index:99999;display:flex;align-items:center;justify-content:center}
+  .overlay .ov-box{background:#fff;border-radius:16px;padding:28px 34px;text-align:center;font-size:15px;font-weight:700;color:var(--navy);line-height:1.6}
+  .overlay small{display:block;font-weight:400;color:var(--muted);font-size:12.5px;margin-top:4px}
+  .ov-spin{width:36px;height:36px;border:4px solid #eadfca;border-top-color:var(--gold);border-radius:50%;margin:0 auto 14px;animation:spin .8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* PDF용 응답지 (화면 밖) */
+  #sheet-host{position:fixed;left:-9999px;top:0}
+  .sheet{width:794px;background:#fff;padding:40px 44px 70px;font-family:'Noto Sans KR',sans-serif;color:#222}
+  .sheet h1{font-family:'Noto Serif KR',serif;font-size:22px;color:#1a3a5c;margin-bottom:4px;text-align:center}
+  .sheet .sub{color:#777;font-size:12px;margin-bottom:16px;text-align:center}
+  .sheet .meta{font-size:12.5px;margin-bottom:3px}
+  .sheet .meta b{color:#a8842f;margin-right:8px}
+  .sheet .hand{background:#f3f7fb;border-radius:8px;padding:10px 13px;font-size:12px;margin:12px 0 16px;color:#33506e;line-height:1.6}
+  .sheet h3{font-family:'Noto Serif KR',serif;font-size:15px;color:#1a3a5c;border-bottom:1.5px solid #c89b4a;padding-bottom:5px;margin:20px 0 9px}
+  .sheet table{width:100%;border-collapse:collapse;font-size:11.5px}
+  .sheet th,.sheet td{border:1px solid #dcd5c7;padding:5px 7px;text-align:left;vertical-align:top;line-height:1.45}
+  .sheet th{background:#1a3a5c;color:#fff;font-weight:700;text-align:center}
+  .sheet td.c{text-align:center;white-space:nowrap}
+  .sheet td.area{background:#f7f4ec;font-weight:700;color:#5b4a24;text-align:center;white-space:nowrap}
+  .sheet .qnote-s{color:#8b8378;font-size:10.5px;line-height:1.5;margin-bottom:3px}
+  .sheet .ans{font-weight:700;color:#3f7d4f}
+  .sheet .free{border:1px solid #dcd5c7;border-radius:6px;padding:9px 11px;font-size:12px;margin-bottom:8px;line-height:1.6;min-height:34px;white-space:pre-wrap}
+  .sheet .freelab{font-size:11.5px;font-weight:700;color:#1a3a5c;margin:10px 0 4px}
+  .sheet .note{font-size:10.5px;color:#888;margin-top:10px;line-height:1.6}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="brand" id="brandLine"></div>
+    <h1 id="headTitle">부모만족도 조사</h1>
+    <p id="headDesc">해당되는 곳에 체크해 주세요. 무기명으로 진행됩니다.</p>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="pbar"><i id="pbar"></i></div>
+  <div id="app"></div>
+</div>
+
+<div id="sheet-host"></div>
+
+<script src="config.js"></script>
+<script>
+/* ==================================================================
+   상태
+   ================================================================== */
+const $ = id => document.getElementById(id);
+const ITEMS = CONFIG.flatItems();          // 전체 문항 (영역 정보 포함)
+const TOTAL = ITEMS.length;
+
+/* 링크의 k 값은 주소에 안전한 글자만 쓰도록 +와 /를 -와 _로 바꿔 담습니다.
+   (주소에서 +는 빈칸으로 바뀌어 버려서, 어린이집 이름에 따라 링크가 깨지는 일이 있었습니다.
+    예전에 만든 링크도 계속 열리도록 빈칸도 +로 되돌립니다.) */
+function b64url(s){ return btoa(s).replace(/\+/g,"-").replace(/\//g,"_"); }
+function readLink(){
+  let p = new URLSearchParams(location.search).get("k");
+  if(!p) return null;
+  p = p.replace(/ /g,"+").replace(/-/g,"+").replace(/_/g,"/");
+  try { return JSON.parse(decodeURIComponent(atob(p))); } catch(e){ return null; }
+}
+function todayStr(){
+  const d = new Date();
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+}
+function newId(){
+  return Date.now().toString(36) + "-" + Math.random().toString(36).slice(2,10);
+}
+
+const link = readLink();
+const state = {
+  mode: link ? "survey" : "generator",
+  org:    link ? (link.o||"") : "",
+  email:  link ? (link.e||"") : "",
+  period: link ? (link.p||"") : "",
+  copies: link ? (link.c||"") : "",
+  id: newId(),
+  date: todayStr(),
+  role: "", roleEtc: "",
+  age: "",
+  answers: {},           // {문항번호(1부터): 점수}
+  freq: "", freqEtc: "",
+  open1: "", open2: "", cheer: "",
+  step: 0                // 0=시작, 1=문항, 2=수요조사, 3=완료
+};
+
+/* ==================================================================
+   렌더
+   ================================================================== */
+function fill(t){ return (t||"").replace(/\{원\}/g, state.org || "저희 어린이집"); }
+
+function setProgress(){
+  let pct = 0;
+  if(state.mode === "generator"){ pct = 0; }
+  else if(state.step === 0) pct = 5;
+  else if(state.step === 1) pct = 5 + Math.round(70 * Object.keys(state.answers).length / TOTAL);
+  else if(state.step === 2) pct = 85;
+  else pct = 100;
+  $("pbar").style.width = pct + "%";
+}
+
+function render(){
+  $("brandLine").textContent = CONFIG.brand;
+  if(state.mode === "generator"){
+    $("headTitle").textContent = "부모만족도 조사 · 링크 만들기";
+    $("headDesc").textContent = "어린이집 정보를 넣으면 부모님께 보낼 설문 링크가 만들어집니다.";
+    renderGenerator();
+  } else {
+    $("headTitle").textContent = CONFIG.year + "년 " + (state.org||"") + " 부모만족도 조사";
+    $("headDesc").textContent = "해당되는 곳에 체크해 주세요. 무기명으로 진행됩니다.";
+    if(state.step === 0) renderIntro();
+    else if(state.step === 1) renderQuestions();
+    else if(state.step === 2) renderExtra();
+    else renderDone();
+  }
+  setProgress();
+  window.scrollTo(0,0);
+}
+
+/* ---------------- 링크 만들기 ---------------- */
+function renderGenerator(){
+  $("app").innerHTML = `
+  <div class="card">
+    <h2><span class="step-num">🏫</span> 부모님께 보낼 링크 만들기</h2>
+    <p class="lead">어린이집 이름과 응답을 받을 이메일을 넣으면 링크가 만들어집니다.<br>부모님이 제출하면 응답지 PDF가 그 이메일로 자동 전송됩니다.</p>
+
+    <div class="field"><label>어린이집 이름 <span style="color:#c0653a">*</span></label>
+      <input id="g-org" placeholder="예) 멘토어린이집" value="${esc(state.org)}"></div>
+
+    <div class="field"><label>응답지(PDF) 받을 이메일 <span style="color:#c0653a">*</span></label>
+      <input id="g-email" type="email" placeholder="예) mykinder@gmail.com" value="${esc(state.email)}">
+      <p class="hint" style="color:#c0653a">👉 되도록 <b>지메일(gmail.com)</b>이나 네이버 주소를 넣어주세요.<br><b>한메일(@hanmail.net)로는 응답 메일이 도착하지 않습니다.</b></p></div>
+
+    <div class="field"><label>조사 기간</label>
+      <input id="g-period" placeholder="예) 2026. 2. 17.(화) ~ 2026. 2. 24.(화)" value="${esc(state.period)}">
+      <p class="hint">결과지에 그대로 들어갑니다. 비워두셔도 됩니다.</p></div>
+
+    <div class="field"><label>배부 부수 (가정 수)</label>
+      <input id="g-copies" type="number" min="0" placeholder="예) 6" value="${esc(state.copies)}">
+      <p class="hint">회신율을 계산할 때 씁니다. 비워두면 결과 화면에서 넣으셔도 됩니다.</p></div>
+
+    <button class="btn-main" onclick="genLink()">🔗 부모님 링크 만들기</button>
+    <div id="gen-out"></div>
+
+    <div class="notice" style="margin-top:18px">
+      💡 <b>다음 순서로 쓰시면 됩니다</b><br>
+      1. 위에서 링크를 만들어 부모님께 <b>카카오톡·문자·키즈노트</b>로 보냅니다.<br>
+      2. 부모님이 체크하고 제출하면 <b>응답지 PDF가 이메일로 옵니다.</b><br>
+      3. 메일에 온 PDF들을 <b>결과 화면</b>에 올리면 결과지가 자동으로 완성됩니다.
+    </div>
+    <a class="btn-sub lprev" style="display:block;text-decoration:none" href="result.html">📊 결과 화면 열기</a>
+  </div>`;
+}
+
+function genLink(){
+  const org = $("g-org").value.trim(), email = $("g-email").value.trim();
+  const period = $("g-period").value.trim(), copies = $("g-copies").value.trim();
+  const out = $("gen-out");
+  if(!org || !email){ out.innerHTML = '<div class="err">어린이집 이름과 이메일을 모두 넣어주세요.</div>'; return; }
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ out.innerHTML = '<div class="err">이메일 형식을 확인해 주세요.</div>'; return; }
+  if(/@hanmail\.net$/i.test(email)){
+    out.innerHTML = '<div class="err">😢 한메일(@hanmail.net) 주소로는 응답 메일이 도착하지 않아요.<br><b>지메일(gmail.com)</b>이나 네이버 주소로 바꿔서 넣어주세요.</div>'; return;
+  }
+  state.org = org; state.email = email; state.period = period; state.copies = copies;
+  const k = b64url(encodeURIComponent(JSON.stringify({o:org, e:email, p:period, c:copies})));
+  const base = location.origin + location.pathname;
+  const linkUrl = base + "?k=" + k;
+  const msg = `[${org} 부모만족도 조사]\n\n안녕하세요, 학부모님.\n더 나은 보육을 위해 부모만족도 조사를 실시합니다.\n무기명으로 진행되며 3분이면 끝납니다.\n\n👉 ${linkUrl}\n\n${period ? "참여 기간: " + period + "\n" : ""}소중한 의견 부탁드립니다. 감사합니다.`;
+  out.innerHTML = `<div class="linkbox">
+    <div class="ll">✅ 부모님 링크가 만들어졌어요!</div>
+    <input id="genlink" readonly value="${esc(linkUrl)}" onclick="this.select()">
+    <div class="lrow">
+      <button class="btn-sub" onclick="copyText(this, document.getElementById('genlink').value)">📋 링크 복사</button>
+      <a class="btn-sub lprev" href="${esc(linkUrl)}" target="_blank">👀 부모님 화면 미리보기</a>
+    </div>
+    <p class="lnote">이 링크로 제출된 응답지는 <b>${esc(email)}</b> 로 전송됩니다.</p>
+    <div class="ll" style="margin-top:16px">📩 이대로 복사해서 보내세요</div>
+    <div class="msgbox" id="genmsg">${esc(msg)}</div>
+    <button class="btn-sub" onclick="copyText(this, document.getElementById('genmsg').textContent)">📋 안내문 통째로 복사</button>
+  </div>`;
+}
+function copyText(btn, text){
+  try{ navigator.clipboard.writeText(text); }
+  catch(e){
+    const ta=document.createElement("textarea"); ta.value=text; document.body.appendChild(ta);
+    ta.select(); document.execCommand("copy"); ta.remove();
+  }
+  const t = btn.textContent; btn.textContent = "✅ 복사됐어요!"; setTimeout(()=>btn.textContent=t, 1500);
+}
+
+/* ---------------- 부모: 시작 화면 ---------------- */
+function renderIntro(){
+  const R = CONFIG.respondent;
+  $("app").innerHTML = `
+  <div class="card">
+    <div class="orgbanner">🏫 <b>${esc(state.org)}</b> 부모만족도 조사${state.period ? " · " + esc(state.period) : ""}</div>
+    <h2><span class="step-num">1</span> 시작하기 전에</h2>
+    <p class="lead" style="line-height:1.8">${esc(fill(CONFIG.intro))}</p>
+    <div class="notice">
+      ✅ <b>무기명</b>으로 작성합니다. 이름을 적지 않으셔도 됩니다.<br>
+      ⏱️ 총 <b>${TOTAL}문항</b>, 3분이면 끝납니다.<br>
+      📩 제출하시면 응답지가 어린이집으로 자동 전달됩니다.
+    </div>
+    <div class="field"><label>${esc(R.roleLabel)}</label>
+      <div class="chips" id="roleChips">
+        ${R.roles.map(r=>`<button class="chip ${state.role===r?'on':''}" onclick="pickRole('${esc(r)}')">${esc(r)}</button>`).join("")}
+      </div>
+      <div id="roleEtcWrap" style="margin-top:10px;${state.role===R.roles[R.roles.length-1]?'':'display:none'}">
+        <input id="roleEtc" placeholder="관계를 적어주세요 (예: 조부모)" value="${esc(state.roleEtc)}" oninput="state.roleEtc=this.value">
+      </div>
+    </div>
+    <div class="field"><label>${esc(R.ageLabel)}</label>
+      <div class="chips" id="ageChips">
+        ${R.ages.map(a=>`<button class="chip ${state.age===a?'on':''}" onclick="pickAge('${esc(a)}')">${esc(a)}</button>`).join("")}
+      </div>
+    </div>
+    <div class="row"><span></span>
+      <button class="nav btn-next" id="introNext" onclick="go(1)" ${(state.role&&state.age)?'':'disabled'}>시작하기 →</button>
+    </div>
+  </div>`;
+}
+function pickRole(r){
+  state.role = r;
+  const R = CONFIG.respondent;
+  document.querySelectorAll("#roleChips .chip").forEach(el=>el.classList.toggle("on", el.textContent===r));
+  const w = $("roleEtcWrap"); if(w) w.style.display = (r===R.roles[R.roles.length-1]) ? "" : "none";
+  syncIntro();
+}
+function pickAge(a){
+  state.age = a;
+  document.querySelectorAll("#ageChips .chip").forEach(el=>el.classList.toggle("on", el.textContent===a));
+  syncIntro();
+}
+function syncIntro(){ const b=$("introNext"); if(b) b.disabled = !(state.role && state.age); }
+
+/* ---------------- 부모: 문항 ---------------- */
+function renderQuestions(){
+  let html = `<div class="card">
+    <h2><span class="step-num">2</span> 만족도 조사</h2>
+    <p class="lead">해당되는 곳에 체크해 주세요.</p>
+    <div class="qcount"><span>응답 현황</span><span class="done" id="qdone">0 / ${TOTAL}</span></div>`;
+
+  let lastArea = null;
+  ITEMS.forEach((it, idx)=>{
+    const n = idx + 1;
+    if(it.area !== lastArea){
+      lastArea = it.area;
+      html += `<div class="areahead" style="background:${CONFIG.areas[it.areaIndex].color}">${esc(it.area)}</div>`;
+    }
+    const sel = state.answers[n];
+    html += `<div class="q ${sel!==undefined?'answered':'unanswered'}" id="q-${n}">
+      ${it.note ? `<div class="qnote">${esc(fill(it.note))}</div>` : ""}
+      <div class="qhead"><div class="qno">${n}</div><div class="qtext">${esc(fill(it.text))}</div></div>
+      <div class="scale">`;
+    CONFIG.scale.forEach(s=>{
+      const short = esc(s.short).replace(/ /g,"<br>");
+      html += `<div class="opt">
+        <input type="radio" name="q${n}" id="q${n}-${s.v}" ${sel===s.v?'checked':''} onchange="setAns(${n},${s.v})">
+        <label for="q${n}-${s.v}"><b>${s.v}</b>${short}</label>
+      </div>`;
+    });
+    html += `</div></div>`;
+  });
+
+  html += `<div id="q-status"></div>
+    <div class="row">
+      <button class="nav btn-prev" onclick="go(0)">← 이전</button>
+      <button class="nav btn-next" onclick="go(2)">다음 →</button>
+    </div>
+  </div>`;
+  $("app").innerHTML = html;
+  updateCount();
+}
+function setAns(n, v){
+  state.answers[n] = v;
+  const q = $("q-"+n); if(q){ q.classList.remove("unanswered"); q.classList.add("answered"); }
+  updateCount(); setProgress();
+}
+function updateCount(){
+  const el = $("qdone"); if(el) el.textContent = Object.keys(state.answers).length + " / " + TOTAL;
+}
+
+/* ---------------- 부모: 수요조사 ---------------- */
+function renderExtra(){
+  const E = CONFIG.extra;
+  const last = E.frequency.options[E.frequency.options.length-1];
+  $("app").innerHTML = `
+  <div class="card">
+    <h2><span class="step-num">3</span> ${esc(E.title)}</h2>
+    <p class="lead">${E.subtitle ? esc(E.subtitle) + "<br>" : ""}점수에 들어가지 않는 의견 조사입니다. 편하게 적어주세요.</p>
+
+    <div class="field"><label>1. ${esc(E.frequency.question)}</label>
+      <div class="chips" id="freqChips">
+        ${E.frequency.options.map(o=>`<button class="chip ${state.freq===o?'on':''}" onclick="pickFreq('${esc(o)}')">${esc(o)}</button>`).join("")}
+      </div>
+      <div id="freqEtcWrap" style="margin-top:10px;${state.freq===last?'':'display:none'}">
+        <input id="freqEtc" placeholder="원하시는 횟수를 적어주세요" value="${esc(state.freqEtc)}" oninput="state.freqEtc=this.value">
+      </div>
+    </div>
+
+    <div class="field"><label>2. ${esc(E.open1)}</label>
+      <textarea id="open1" placeholder="자유롭게 적어주세요 (선택)" oninput="state.open1=this.value">${esc(state.open1)}</textarea></div>
+
+    <div class="field"><label>3. ${esc(E.open2)}</label>
+      <textarea id="open2" placeholder="자유롭게 적어주세요 (선택)" oninput="state.open2=this.value">${esc(state.open2)}</textarea></div>
+
+    <div class="field"><label>💌 ${esc(E.cheerTitle)}</label>
+      <p class="hint" style="margin-top:0;margin-bottom:7px">${esc(E.cheerNote)}</p>
+      <textarea id="cheer" placeholder="선생님께 한마디 남겨주세요 (선택)" oninput="state.cheer=this.value">${esc(state.cheer)}</textarea></div>
+
+    <div class="row">
+      <button class="nav btn-prev" onclick="go(1)">← 이전</button>
+      <button class="nav btn-next" onclick="go(3)">다음 →</button>
+    </div>
+  </div>`;
+}
+function pickFreq(o){
+  state.freq = o;
+  const last = CONFIG.extra.frequency.options[CONFIG.extra.frequency.options.length-1];
+  document.querySelectorAll("#freqChips .chip").forEach(el=>el.classList.toggle("on", el.textContent===o));
+  const w = $("freqEtcWrap"); if(w) w.style.display = (o===last) ? "" : "none";
+}
+
+/* ---------------- 부모: 제출 ---------------- */
+function renderDone(){
+  $("app").innerHTML = `
+  <div class="card done-wrap">
+    <div class="big">🎉</div>
+    <h2>다 하셨어요!</h2>
+    <p class="lead">아래 <b>제출하기</b>를 누르면 응답지가 <b>${esc(state.org)}</b>로 전달됩니다.<br>(내 휴대폰·컴퓨터에도 PDF가 저장됩니다)</p>
+    <label class="consent"><input type="checkbox" id="agree" onchange="document.getElementById('subBtn').disabled=!this.checked">
+      <span>무기명 응답 내용이 <b>${esc(state.org)}</b>의 보육 개선 자료로 활용되는 것에 동의합니다.</span></label>
+    <button class="btn-main" id="subBtn" disabled onclick="submitAndSend()">📤 제출하기</button>
+    <div class="notice" style="margin-top:16px;text-align:left">${esc(fill(CONFIG.closing))}</div>
+    <div id="sub-status" class="status"></div>
+    <div class="row"><button class="nav btn-prev" onclick="go(2)">← 이전</button><span></span></div>
+  </div>`;
+}
+
+async function submitAndSend(){
+  const st = $("sub-status"), ov = showOverlay("응답지를 만들고 보내는 중이에요…");
+  $("subBtn").disabled = true;
+  try{
+    const pdf = await makePdf();
+    const fname = `부모만족도_${state.org}_${state.date}_${state.id.slice(0,6)}.pdf`;
+    pdf.save(fname);
+    const b64 = pdf.output("datauristring").split(",")[1];
+    try{
+      await sendEmail(b64, fname);
+      st.innerHTML = `<div class="okbox">✅ 제출이 끝났습니다!<br><b>${esc(state.org)}</b>로 응답지가 전송되었어요. 소중한 의견 감사합니다 😊</div>`;
+    }catch(mailErr){
+      st.innerHTML = `<div class="okbox">✅ 응답지 PDF가 저장되었습니다.<br>자동 전송은 되지 않았어요. 저장된 PDF 파일을 아래 주소로 보내주시면 됩니다.<br><b>${esc(state.email||"어린이집 이메일")}</b></div>
+        <div class="err" style="font-size:12px">자동 전송 실패 사유: ${esc((mailErr&&mailErr.message)||mailErr)}</div>`;
+    }
+  }catch(e){
+    st.innerHTML = `<div class="err">응답지를 만들지 못했어요: ${esc((e&&e.message)||e)}<br>인터넷 연결을 확인하고 다시 눌러주세요.</div>`;
+    $("subBtn").disabled = false;
+  }finally{ hideOverlay(ov); }
+}
+
+async function sendEmail(pdfBase64, filename){
+  const r = await fetch("/api/send", {
+    method: "POST", headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({ to: state.email, org: state.org, year: CONFIG.year,
+      role: state.role, age: state.age, filename, pdfBase64 })
+  });
+  if(!r.ok){
+    let m = "전송 실패(" + r.status + ")";
+    try{ const j = await r.json(); if(j.error) m = j.error; }catch(_){}
+    throw new Error(m);
+  }
+}
+
+/* ==================================================================
+   응답 코드 — 결과 화면이 읽는 부분
+   ================================================================== */
+const CODE_PREFIX = "PMSV1:";
+function buildPayload(){
+  const s = [];
+  for(let i=1;i<=TOTAL;i++) s.push(state.answers[i] === undefined ? 0 : state.answers[i]);
+  return {
+    v: 1,
+    id: state.id,
+    o: state.org,
+    y: CONFIG.year,
+    p: state.period,
+    c: state.copies,
+    d: state.date,
+    r: state.role === CONFIG.respondent.roles[CONFIG.respondent.roles.length-1] && state.roleEtc
+        ? state.role + "(" + state.roleEtc + ")" : state.role,
+    g: state.age,
+    an: CONFIG.areas.map(a=>a.name),
+    ac: CONFIG.areas.map(a=>a.items.length),
+    s: s,
+    f: state.freq === CONFIG.extra.frequency.options[CONFIG.extra.frequency.options.length-1] && state.freqEtc
+        ? state.freq + "(" + state.freqEtc + ")" : state.freq,
+    m1: state.open1, m2: state.open2, ch: state.cheer
+  };
+}
+function encodePayload(p){ return CODE_PREFIX + btoa(encodeURIComponent(JSON.stringify(p))); }
+
+/* ==================================================================
+   응답지 PDF
+   ================================================================== */
+const LIBS = {
+  html2canvas:["https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js","https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js","https://unpkg.com/html2canvas@1.4.1/dist/html2canvas.min.js"],
+  jspdf:["https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js","https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js","https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"]
+};
+function loadScript(src){ return new Promise((res,rej)=>{ const el=document.createElement("script"); el.src=src; el.async=true; el.onload=()=>res(true); el.onerror=()=>rej(new Error(src)); document.head.appendChild(el); }); }
+async function ensureLib(check, urls){
+  if(check()) return;
+  for(const u of urls){ try{ await loadScript(u); }catch(e){} if(check()) return; }
+  throw new Error("필요한 기능을 불러오지 못했어요. 인터넷 연결을 확인해 주세요.");
+}
+
+function buildSheet(){
+  const S = {}; CONFIG.scale.forEach(x=>S[x.v]=x.label);
+  let rows = "", lastArea = null;
+  ITEMS.forEach((it, idx)=>{
+    const n = idx+1, v = state.answers[n];
+    let areaCell = "";
+    if(it.area !== lastArea){
+      lastArea = it.area;
+      const span = CONFIG.areas[it.areaIndex].items.length;
+      areaCell = `<td class="area" rowspan="${span}">${esc(it.area)}</td>`;
+    }
+    const noteHtml = it.note ? `<div class="qnote-s">${esc(fill(it.note))}</div>` : "";
+    rows += `<tr>${areaCell}<td class="c">${n}</td><td>${noteHtml}${esc(fill(it.text))}</td>`
+         +  `<td class="c"><span class="ans">${v===undefined?'-':v}</span></td>`
+         +  `<td class="c">${v===undefined?'-':esc(S[v])}</td></tr>`;
+  });
+
+  const E = CONFIG.extra;
+  const p = buildPayload();
+  return `<div class="sheet" id="sheet-main">
+    <h1>${esc(CONFIG.year)}년 ${esc(state.org)} 부모만족도 조사 응답지</h1>
+    <div class="sub">무기명 응답지 · 어린이집 보육 개선 자료로만 활용됩니다</div>
+    <div class="meta"><b>참여자</b>${esc(p.r||'-')} &nbsp;&nbsp;&nbsp; <b>자녀 연령</b>${esc(state.age||'-')}</div>
+    <div class="meta"><b>조사 기간</b>${esc(state.period||'-')} &nbsp;&nbsp;&nbsp; <b>제출일</b>${esc(state.date)}</div>
+    <div class="hand">📩 이 응답지는 부모님이 직접 체크한 자료입니다. 어린이집 결과 화면에 이 PDF 파일을 그대로 올리면 집계가 자동으로 됩니다.</div>
+
+    <h3>만족도 응답 (5점 만점)</h3>
+    <table>
+      <thead><tr><th style="width:13%">영역</th><th style="width:6%">번호</th><th>내용</th><th style="width:8%">점수</th><th style="width:15%">응답</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <p class="note">※ ${CONFIG.scale.map(s=>esc(s.short)+" "+s.v+"점").join(" / ")} 으로 환산</p>
+
+    <h3>${esc(E.title)}</h3>
+    <div class="freelab">1. ${esc(E.frequency.question)}</div>
+    <div class="free">${esc(p.f || "(응답 없음)")}</div>
+    <div class="freelab">2. ${esc(E.open1)}</div>
+    <div class="free">${esc(state.open1 || "(응답 없음)")}</div>
+    <div class="freelab">3. ${esc(E.open2)}</div>
+    <div class="free">${esc(state.open2 || "(응답 없음)")}</div>
+    <div class="freelab">💌 ${esc(E.cheerTitle)}</div>
+    <div class="free">${esc(state.cheer || "(응답 없음)")}</div>
+
+    <p class="note">응답번호 ${esc(state.id)} · 이 번호로 같은 응답이 두 번 집계되는 것을 막습니다.</p>
+  </div>`;
+}
+
+async function makePdf(){
+  await ensureLib(()=>window.html2canvas, LIBS.html2canvas);
+  await ensureLib(()=>window.jspdf && window.jspdf.jsPDF, LIBS.jspdf);
+
+  const host = $("sheet-host");
+  host.innerHTML = buildSheet();
+  host.style.left = "0"; host.style.top = "0"; host.style.zIndex = "-1"; host.style.background = "#fff";
+  await new Promise(r=>setTimeout(r, 250));
+
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF("p","mm","a4");
+  const PW = 210, PH = 297;
+
+  const el = $("sheet-main");
+  const canvas = await html2canvas(el, {scale:2, backgroundColor:"#ffffff", useCORS:true, logging:false});
+  const pageHpx = canvas.width * (PH / PW);
+  let first = true, lastBottomMm = 0;
+
+  for(let y=0; y<canvas.height-2; y+=pageHpx){
+    const sliceH = Math.min(pageHpx, canvas.height - y);
+    const slice = document.createElement("canvas");
+    slice.width = canvas.width; slice.height = sliceH;
+    slice.getContext("2d").drawImage(canvas, 0, y, canvas.width, sliceH, 0, 0, canvas.width, sliceH);
+    if(!first) pdf.addPage();
+    const hMm = sliceH * (PW / canvas.width);
+    pdf.addImage(slice.toDataURL("image/jpeg", 0.92), "JPEG", 0, 0, PW, hMm);
+    lastBottomMm = hMm;
+    first = false;
+  }
+
+  /* --- 결과 화면이 읽을 코드를 두 곳에 심는다 --- */
+  const code = encodePayload(buildPayload());
+
+  // ① PDF 속성(가장 확실한 경로)
+  pdf.setProperties({
+    title: CONFIG.year + "년 " + state.org + " 부모만족도 조사 응답지",
+    subject: "부모만족도 조사 응답",
+    creator: "satisfaction-survey",
+    keywords: code
+  });
+
+  // ② 흰 글자로 한 번 더 (①이 지워져도 읽히도록)
+  const lines = code.match(/.{1,150}/g) || [];
+  let y = lastBottomMm + 4;
+  if(y + lines.length * 1.7 > PH - 4){ pdf.addPage(); y = 10; }
+  pdf.setFontSize(2.5); pdf.setTextColor(255,255,255);
+  lines.forEach((ln,i)=> pdf.text(ln, 4, y + i*1.7));
+  pdf.setTextColor(0,0,0);
+
+  host.style.left = "-9999px";
+  return pdf;
+}
+
+function showOverlay(txt){
+  const o = document.createElement("div"); o.className = "overlay";
+  o.innerHTML = '<div class="ov-box"><div class="ov-spin"></div>' + (txt||"처리 중이에요…") + '<small>잠시만 기다려 주세요</small></div>';
+  document.body.appendChild(o); return o;
+}
+function hideOverlay(o){ if(o) o.remove(); }
+
+/* ==================================================================
+   이동 / 유틸
+   ================================================================== */
+function go(step){
+  if(step === 2 && state.step === 1){
+    const done = Object.keys(state.answers).length;
+    if(done < TOTAL){
+      let first = 1; for(let i=1;i<=TOTAL;i++){ if(state.answers[i]===undefined){ first=i; break; } }
+      $("q-status").innerHTML = `<div class="err">아직 ${TOTAL-done}개 문항이 남았어요. (${done}/${TOTAL}) 모두 체크해 주세요 🙏</div>`;
+      const q = $("q-"+first); if(q) q.scrollIntoView({behavior:"smooth", block:"center"});
+      return;
+    }
+  }
+  state.step = step; render();
+}
+function esc(s){
+  return String(s===undefined||s===null?"":s)
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+}
+
+render();
+</script>
+</body>
+</html>

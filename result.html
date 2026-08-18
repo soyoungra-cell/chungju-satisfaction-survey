@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>부모만족도 조사 결과</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{ --navy:#1a3a5c; --cream:#faf7f0; --gold:#c89b4a; --gold-d:#a8842f; --line:#e7e0d3; --ink:#2c2c2c; --muted:#7a7268; --ok:#3f7d4f; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Noto Sans KR',sans-serif;background:var(--cream);color:var(--ink);line-height:1.6}
+  .wrap{max-width:900px;margin:0 auto;padding:0 16px 60px}
+
+  header{background:linear-gradient(135deg,#1a3a5c,#21496f);color:#fff;padding:26px 0 22px;margin-bottom:20px}
+  header .brand{color:var(--gold);font-size:12.5px;font-weight:700;margin-bottom:6px}
+  header h1{font-family:'Noto Serif KR',serif;font-size:23px}
+  header p{font-size:13.5px;color:#d3e0ee;margin-top:7px}
+
+  .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 20px;box-shadow:0 3px 14px rgba(26,58,92,.05);margin-bottom:18px}
+  h2{font-family:'Noto Serif KR',serif;color:var(--navy);font-size:19px;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+  .lead{color:var(--muted);font-size:13.5px;margin-bottom:16px;line-height:1.7}
+
+  .field{margin-bottom:13px}
+  .field label{display:block;font-size:13px;font-weight:700;color:var(--navy);margin-bottom:6px}
+  .field input,.field textarea{width:100%;padding:10px 12px;border:1.5px solid var(--line);border-radius:9px;font-size:14px;font-family:inherit;background:#fff}
+  .field textarea{min-height:60px;resize:vertical;line-height:1.6}
+  .field input:focus,.field textarea:focus{outline:none;border-color:var(--gold)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:640px){ .grid2{grid-template-columns:1fr} }
+
+  button{font-family:inherit;cursor:pointer}
+  .btn{background:var(--navy);color:#fff;border:none;border-radius:11px;padding:12px 20px;font-size:14.5px;font-weight:700}
+  .btn.gold{background:var(--gold)} .btn.gold:hover{background:var(--gold-d)}
+  .btn.ghost{background:#fff;border:1.5px solid var(--line);color:var(--muted)}
+  .btn.danger{background:#fff;border:1.5px solid #e0b4b4;color:#a45a5a}
+  .btn:disabled{background:#c3ccd6;cursor:not-allowed}
+  .btnrow{display:flex;gap:9px;flex-wrap:wrap}
+
+  /* 업로드 */
+  .drop{border:2.5px dashed #d8cdb6;border-radius:16px;background:#fffdf8;padding:34px 20px;text-align:center;transition:.15s}
+  .drop.over{border-color:var(--gold);background:#fdf4e6}
+  .drop .ic{font-size:40px}
+  .drop .t{font-size:16px;font-weight:700;color:var(--navy);margin-top:8px}
+  .drop .d{font-size:13px;color:var(--muted);margin-top:6px;line-height:1.7}
+  .drop input{display:none}
+
+  .loglist{margin-top:14px;font-size:13px;max-height:230px;overflow:auto}
+  .logline{padding:7px 11px;border-radius:8px;margin-bottom:5px;line-height:1.5}
+  .logline.ok{background:#eef6ea;color:#2f6b40}
+  .logline.dup{background:#f5f2e7;color:#7a6a35}
+  .logline.bad{background:#fdecec;color:#9a4a4a}
+
+  .counter{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+  .cbox{flex:1;min-width:110px;background:#f3f7fb;border-radius:12px;padding:13px 14px;text-align:center}
+  .cbox .n{font-size:24px;font-weight:700;color:var(--navy)}
+  .cbox .l{font-size:12px;color:var(--muted);margin-top:2px}
+
+  .rlist{font-size:13px;max-height:220px;overflow:auto;border:1px solid var(--line);border-radius:10px}
+  .rlist .r{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid #f0ebe0}
+  .rlist .r:last-child{border-bottom:none}
+  .rlist .r span{color:var(--muted);font-size:12.5px}
+  .rlist .x{background:none;border:none;color:#b06767;font-size:15px;padding:2px 6px}
+
+  .err{background:#fdecec;color:#9a4a4a;border-radius:10px;padding:11px 14px;font-size:13px;margin-top:10px;line-height:1.6}
+  .okbox{background:#eef6ea;color:#2f6b40;border-radius:10px;padding:11px 14px;font-size:13px;margin-top:10px;line-height:1.6}
+  .hintbox{background:#f3f7fb;border-radius:11px;padding:13px 15px;font-size:13px;line-height:1.85;margin-top:12px}
+  .hintbox b{color:var(--navy)}
+
+  /* ================= 결과지 (A4) ================= */
+  .paper-scroll{overflow-x:auto;padding-bottom:6px}
+  .page{width:210mm;min-height:297mm;background:#fff;margin:0 auto 16px;padding:15mm 16mm;
+        box-shadow:0 4px 20px rgba(0,0,0,.10);font-size:10.5pt;color:#222;position:relative;word-break:keep-all}
+  /* 여러 쪽으로 넘어갈 수 있는 쪽 — 쪽마다 위·아래 여백이 반복되도록 표로 감쌈 */
+  .page.flow{padding:0 16mm}
+  .flowtbl{width:100%;border-collapse:collapse}
+  .flowtbl > thead > tr > td.sp,.flowtbl > tfoot > tr > td.sp{height:15mm;border:none;padding:0}
+  .flowtbl > tbody > tr > td{border:none;padding:0;vertical-align:top}
+  .page h1{font-family:'Noto Serif KR',serif;font-size:16pt;text-align:center;margin-bottom:12px;letter-spacing:-.3px}
+  .ov{font-size:10pt;line-height:1.85;margin-bottom:4px;display:flex;gap:6px}
+  .ov .k{white-space:nowrap;font-weight:700}
+  .ov .v{white-space:pre-line}
+  .caption{text-align:center;font-weight:700;font-size:10.5pt;margin:14px 0 8px}
+  table.rt{width:100%;border-collapse:collapse;font-size:10pt}
+  table.rt th,table.rt td{border:1px solid #9aa3ad;padding:6px 8px;text-align:center}
+  table.rt th{background:#f2f5f8;font-weight:700}
+  table.rt td.strong{font-weight:700}
+  .charts{display:flex;gap:8px;margin:12px 0 4px;align-items:stretch}
+  .chartbox{border:1px solid #d8dee5;border-radius:6px;padding:6px 4px;background:#fff}
+  .chartbox.main{flex:1 1 auto}
+  .chartbox.total{flex:0 0 34%}
+  .chartbox svg{display:block;width:100%;height:auto}
+
+  table.remark{width:100%;border-collapse:collapse;font-size:9.5pt;margin-top:10px}
+  table.remark th,table.remark td{border:1px solid #9aa3ad;padding:7px 9px;vertical-align:top;line-height:1.7}
+  table.remark th{background:#f2f5f8;text-align:center;font-weight:700}
+  table.remark td.lab{width:70px;text-align:center;font-weight:700;background:#fafbfc}
+  .twocol{display:flex;gap:10px;margin-top:10px;align-items:flex-start}
+  .twocol .left{flex:1 1 55%}
+  .twocol .right{flex:1 1 45%;border:1px solid #e3d9c4;background:#fdfaf3;border-radius:6px;padding:11px 13px;font-size:9.5pt;line-height:1.85}
+  .twocol .right ul{list-style:none;padding:0;margin:0}
+  .twocol .right li{margin-bottom:7px;padding-left:11px;position:relative}
+  .twocol .right li:before{content:"▪";position:absolute;left:0;color:#8a7a55}
+  .thanks{text-align:center;font-weight:700;margin-top:12px;white-space:pre-line;line-height:1.9}
+
+  .sechead{font-family:'Noto Serif KR',serif;font-size:12pt;border-bottom:1.5px solid var(--gold);padding-bottom:4px;margin:16px 0 9px;color:#1a3a5c}
+  .freeitem{border:1px solid #dde2e8;border-radius:5px;padding:7px 10px;margin-bottom:6px;font-size:9.5pt;line-height:1.7;white-space:pre-wrap}
+  .freeitem .who{color:#8b8378;font-size:8.5pt;display:block;margin-bottom:2px}
+  .emptynote{color:#999;font-size:9.5pt;padding:6px 2px}
+
+  [contenteditable]{outline:none}
+  [contenteditable]:focus{background:#fffbe9;box-shadow:0 0 0 2px #f0e2b8}
+  .editnote{font-size:12px;color:var(--muted);margin:6px 0 0}
+
+  .gate{max-width:400px;margin:60px auto}
+  @media print{
+    body{background:#fff}
+    .noprint{display:none !important}
+    @page{size:A4;margin:0}
+    .wrap{max-width:none;padding:0}
+    .paper-scroll{overflow:visible}
+    .page{box-shadow:none;margin:0;page-break-after:always;min-height:296mm}
+    .page:last-child{page-break-after:auto}
+    [contenteditable]:focus{background:none;box-shadow:none}
+  }
+</style>
+</head>
+<body>
+
+<header class="noprint">
+  <div class="wrap">
+    <div class="brand" id="brandLine"></div>
+    <h1>부모만족도 조사 결과</h1>
+    <p>메일로 받은 응답지 PDF를 올리면 결과지가 자동으로 완성됩니다.</p>
+  </div>
+</header>
+
+<div class="wrap">
+  <div id="gate" class="gate noprint"></div>
+  <div id="admin" class="noprint" style="display:none"></div>
+  <div id="report" style="display:none"></div>
+</div>
+
+<script src="config.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const KEY_R = "pms.responses", KEY_M = "pms.meta", KEY_N = "pms.notes";
+
+/* ================== 저장소 ================== */
+function loadJSON(k, def){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : def; }catch(e){ return def; } }
+function saveJSON(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+
+let responses = loadJSON(KEY_R, []);
+let meta = loadJSON(KEY_M, { org:"", year:CONFIG.year, period:"", method:CONFIG.report.methodDefault, copies:"" });
+let notes = loadJSON(KEY_N, { good:"", improve:"", pledge:"", touched:false });
+
+/* ================== 비밀번호 ================== */
+function renderGate(){
+  $("brandLine").textContent = CONFIG.brand;
+  if(sessionStorage.getItem("pms.ok") === "1"){ openAdmin(); return; }
+  $("gate").innerHTML = `
+    <div class="card">
+      <h2>🔒 결과 화면</h2>
+      <p class="lead">어린이집 담당자만 보는 화면입니다. 비밀번호를 넣어주세요.</p>
+      <div class="field"><input id="pw" type="password" placeholder="비밀번호"
+        onkeydown="if(event.key==='Enter')tryPw()"></div>
+      <button class="btn" style="width:100%" onclick="tryPw()">들어가기</button>
+      <div id="pwerr"></div>
+      <p class="editnote">처음 비밀번호는 <b>${esc(CONFIG.adminPassword)}</b> 입니다. config.js 파일에서 바꿀 수 있어요.</p>
+    </div>`;
+}
+function tryPw(){
+  if($("pw").value === CONFIG.adminPassword){ sessionStorage.setItem("pms.ok","1"); openAdmin(); }
+  else $("pwerr").innerHTML = '<div class="err">비밀번호가 맞지 않아요.</div>';
+}
+function openAdmin(){
+  $("gate").style.display="none"; $("admin").style.display=""; $("report").style.display="";
+  // 응답은 있는데 '잘된 점·개선 의견'이 비어 있으면 자동으로 초안을 씁니다
+  if(responses.length && !(notes.good||"").trim()) redraft(true);
+  renderAdmin(); renderReport();
+}
+
+/* ================== 관리 화면 ================== */
+function renderAdmin(){
+  $("admin").innerHTML = `
+  <div class="card">
+    <h2>📥 응답지 올리기</h2>
+    <p class="lead">메일에 온 <b>응답지 PDF</b>를 아래 칸에 끌어다 놓으세요.<br>여러 개를 <b>한꺼번에</b> 올려도 되고, 올 때마다 하나씩 올려도 됩니다.</p>
+    <div class="drop" id="drop" onclick="document.getElementById('fileInput').click()">
+      <div class="ic">📄</div>
+      <div class="t">여기에 PDF를 끌어다 놓으세요</div>
+      <div class="d">또는 눌러서 파일 고르기 · 여러 개 한꺼번에 선택할 수 있어요<br>같은 응답을 두 번 올려도 중복으로 세지 않습니다</div>
+    </div>
+    <input type="file" id="fileInput" accept="application/pdf" multiple style="display:none" onchange="handleFiles(this.files); this.value='';">
+    <div class="loglist" id="uplog"></div>
+  </div>
+
+  <div class="card">
+    <h2>🗂️ 모인 응답</h2>
+    <div class="counter">
+      <div class="cbox"><div class="n" id="cnt-res">0</div><div class="l">회신</div></div>
+      <div class="cbox"><div class="n" id="cnt-copies">-</div><div class="l">배부</div></div>
+      <div class="cbox"><div class="n" id="cnt-rate">-</div><div class="l">회신율</div></div>
+      <div class="cbox"><div class="n" id="cnt-avg">-</div><div class="l">전체 평균</div></div>
+    </div>
+    <div id="mixwarn"></div>
+    <div class="rlist" id="rlist"></div>
+    <div class="btnrow" style="margin-top:12px">
+      <button class="btn ghost" onclick="exportBackup()">💾 백업 내보내기</button>
+      <button class="btn ghost" onclick="document.getElementById('impInput').click()">📂 백업 불러오기</button>
+      <input type="file" id="impInput" accept="application/json" style="display:none" onchange="importBackup(this.files[0])">
+      <button class="btn danger" onclick="clearAll()">🗑️ 전부 지우기</button>
+    </div>
+    <div class="hintbox">
+      ⚠️ <b>꼭 기억해 주세요.</b> 모인 응답은 <b>이 컴퓨터의 이 브라우저에만</b> 저장됩니다.
+      인터넷 기록을 지우거나 다른 컴퓨터에서 열면 보이지 않아요.
+      조사가 끝나면 <b>💾 백업 내보내기</b>를 눌러 파일로 보관해 두세요.
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>📝 결과지에 들어갈 정보</h2>
+    <p class="lead">아래를 채우면 결과지에 그대로 들어갑니다. 응답지에 들어있던 내용은 자동으로 채워집니다.</p>
+    <div class="grid2">
+      <div class="field"><label>어린이집 이름</label><input id="m-org" value="${esc(meta.org)}" oninput="setMeta('org',this.value)"></div>
+      <div class="field"><label>조사 연도</label><input id="m-year" value="${esc(meta.year)}" oninput="setMeta('year',this.value)"></div>
+    </div>
+    <div class="field"><label>조사 기간</label><input id="m-period" placeholder="예) 2026. 2. 17.(화) ~ 2026. 2. 24.(화)" value="${esc(meta.period)}" oninput="setMeta('period',this.value)"></div>
+    <div class="field"><label>조사 방법</label><textarea id="m-method" oninput="setMeta('method',this.value)">${esc(meta.method)}</textarea></div>
+    <div class="field"><label>배부 부수 (가정 수)</label><input id="m-copies" type="number" min="0" placeholder="예) 6" value="${esc(meta.copies)}" oninput="setMeta('copies',this.value)"></div>
+  </div>
+
+  <div class="card">
+    <h2>⌨️ 코드로 직접 넣기 <span style="font-size:12px;color:#7a7268;font-weight:400">(PDF가 안 읽힐 때만)</span></h2>
+    <p class="lead">PDF가 열리지 않거나 읽히지 않을 때, 응답 코드를 붙여넣으면 똑같이 집계됩니다.</p>
+    <div class="field"><textarea id="pastecode" placeholder="PMSV1: 로 시작하는 코드를 붙여넣으세요"></textarea></div>
+    <button class="btn ghost" onclick="addPasted()">코드 넣기</button>
+    <div id="pasteout"></div>
+  </div>
+
+  <div class="card">
+    <h2>🖨️ 결과지 인쇄</h2>
+    <p class="lead">아래 결과지를 그대로 인쇄하거나 PDF로 저장할 수 있습니다.<br>인쇄 창에서 <b>용지 A4</b>, <b>여백 없음</b>, <b>배경 그래픽 켜기</b>로 하면 화면과 똑같이 나옵니다.</p>
+    <div class="btnrow">
+      <button class="btn gold" onclick="window.print()">🖨️ 인쇄 / PDF로 저장</button>
+      <button class="btn ghost" onclick="redraft()">✍️ 잘된 점·개선 의견 다시 쓰기</button>
+    </div>
+  </div>`;
+
+  const d = $("drop");
+  ["dragenter","dragover"].forEach(ev=>d.addEventListener(ev,e=>{e.preventDefault();d.classList.add("over");}));
+  ["dragleave","drop"].forEach(ev=>d.addEventListener(ev,e=>{e.preventDefault();d.classList.remove("over");}));
+  d.addEventListener("drop", e=>{ if(e.dataTransfer && e.dataTransfer.files) handleFiles(e.dataTransfer.files); });
+
+  refreshCounters();
+}
+function setMeta(k,v){ meta[k]=v; saveJSON(KEY_M, meta); renderReport(); refreshCounters(); }
+
+/* ================== PDF 읽기 ================== */
+const PDFJS_LIB = ["https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js",
+                   "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"];
+const PDFJS_WORKER = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+function loadScript(src){ return new Promise((res,rej)=>{ const el=document.createElement("script"); el.src=src; el.onload=()=>res(); el.onerror=()=>rej(new Error(src)); document.head.appendChild(el); }); }
+async function ensurePdfjs(){
+  if(window.pdfjsLib) return window.pdfjsLib;
+  for(const u of PDFJS_LIB){ try{ await loadScript(u); }catch(e){} if(window.pdfjsLib) break; }
+  if(!window.pdfjsLib) throw new Error("PDF 읽기 기능을 불러오지 못했어요. 인터넷 연결을 확인해 주세요.");
+  window.pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJS_WORKER;
+  return window.pdfjsLib;
+}
+
+const CODE_RE = /PMSV1:([A-Za-z0-9+/=]+)/;
+function decodeCode(raw){
+  const m = CODE_RE.exec(raw);
+  if(!m) return null;
+  try{ return JSON.parse(decodeURIComponent(atob(m[1]))); }catch(e){ return null; }
+}
+
+async function readPdfPayload(file){
+  const lib = await ensurePdfjs();
+  const buf = await file.arrayBuffer();
+  const doc = await lib.getDocument({ data: new Uint8Array(buf) }).promise;
+
+  // ① PDF 속성에서 찾기
+  try{
+    const md = await doc.getMetadata();
+    const kw = (md && md.info && md.info.Keywords) || "";
+    const p = decodeCode(kw);
+    if(p) return p;
+  }catch(e){}
+
+  // ② 본문 글자에서 찾기
+  let all = "";
+  for(let i=1;i<=doc.numPages;i++){
+    const page = await doc.getPage(i);
+    const tc = await page.getTextContent();
+    all += tc.items.map(it=>it.str).join("");
+  }
+  return decodeCode(all);
+}
+
+async function handleFiles(files){
+  const list = Array.from(files||[]).filter(f=>/\.pdf$/i.test(f.name) || f.type==="application/pdf");
+  if(!list.length){ log("bad","PDF 파일이 아니에요."); return; }
+  log("dup", `📥 ${list.length}개 파일을 읽는 중이에요…`);
+  let added=0, dup=0, bad=0;
+  for(const f of list){
+    try{
+      const p = await readPdfPayload(f);
+      if(!p || !p.id || !Array.isArray(p.s)){ bad++; log("bad", `❌ ${f.name} — 이 조사서의 응답지가 아니에요.`); continue; }
+      if(responses.some(r=>r.id===p.id)){ dup++; log("dup", `↩️ ${f.name} — 이미 올린 응답이에요. (중복 제외)`); continue; }
+      responses.push(p); added++;
+      log("ok", `✅ ${f.name} — 집계했어요.`);
+    }catch(e){
+      bad++; log("bad", `❌ ${f.name} — 읽지 못했어요. (${(e&&e.message)||e})`);
+    }
+  }
+  if(added){
+    saveJSON(KEY_R, responses);
+    autoFillMeta();
+    notes.touched ? null : redraft(true);
+    renderReport();
+  }
+  refreshCounters();
+  log("dup", `📊 끝났어요 — 새로 집계 ${added}건 / 중복 ${dup}건 / 못 읽음 ${bad}건`);
+}
+function log(kind, text){
+  const box = $("uplog"); if(!box) return;
+  const d = document.createElement("div"); d.className = "logline " + kind; d.textContent = text;
+  box.prepend(d);
+}
+
+function addPasted(){
+  const raw = $("pastecode").value.trim();
+  const p = decodeCode(raw);
+  const out = $("pasteout");
+  if(!p || !p.id || !Array.isArray(p.s)){ out.innerHTML = '<div class="err">이 조사서의 응답 코드가 아니에요. 코드를 다시 확인해 주세요.</div>'; return; }
+  if(responses.some(r=>r.id===p.id)){ out.innerHTML = '<div class="okbox">이미 집계된 응답이에요. (중복 제외)</div>'; return; }
+  responses.push(p); saveJSON(KEY_R, responses); autoFillMeta();
+  if(!notes.touched) redraft(true);
+  renderReport(); refreshCounters();
+  $("pastecode").value = "";
+  out.innerHTML = '<div class="okbox">✅ 집계했어요.</div>';
+}
+
+function autoFillMeta(){
+  const first = responses[0]; if(!first) return;
+  let changed = false;
+  if(!meta.org && first.o){ meta.org = first.o; changed = true; }
+  if(first.y && meta.year === CONFIG.year && first.y !== meta.year){ meta.year = first.y; changed = true; }
+  if(!meta.period && first.p){ meta.period = first.p; changed = true; }
+  if(!meta.copies && first.c){ meta.copies = first.c; changed = true; }
+  if(changed){ saveJSON(KEY_M, meta); renderAdminFields(); }
+}
+function renderAdminFields(){
+  if($("m-org")) $("m-org").value = meta.org;
+  if($("m-year")) $("m-year").value = meta.year;
+  if($("m-period")) $("m-period").value = meta.period;
+  if($("m-copies")) $("m-copies").value = meta.copies;
+}
+
+function refreshCounters(){
+  const st = stats();
+  if($("cnt-res")) $("cnt-res").textContent = responses.length;
+  if($("cnt-copies")) $("cnt-copies").textContent = meta.copies || "-";
+  if($("cnt-rate")) $("cnt-rate").textContent = st.rate === null ? "-" : st.rate + "%";
+  if($("cnt-avg")) $("cnt-avg").textContent = st.total === null ? "-" : st.total.toFixed(1);
+  renderList();
+}
+function renderList(){
+  const w = $("mixwarn");
+  if(w) w.innerHTML = hasMixedAreas()
+    ? '<div class="err">⚠️ <b>조사 문항이 서로 다른 응답이 섞여 있어요.</b><br>조사 도중에 문항이나 영역을 바꾸면 이렇게 됩니다. 결과지에는 모든 영역이 다 나오지만, 영역마다 응답한 사람 수가 달라 숫자를 비교하기 어렵습니다.<br>지난 조사 자료라면 <b>🗑️ 전부 지우기</b>로 정리한 뒤 다시 올려주세요.</div>'
+    : "";
+  const el = $("rlist"); if(!el) return;
+  if(!responses.length){ el.innerHTML = '<div class="emptynote" style="padding:14px">아직 올린 응답이 없어요.</div>'; return; }
+  el.innerHTML = responses.map((r,i)=>{
+    const avg = r.s.length ? (r.s.reduce((a,b)=>a+b,0)/r.s.length) : 0;
+    return `<div class="r"><div>${i+1}. <b>${esc(r.r||"-")}</b> <span>· ${esc(r.g||"-")} · ${esc(r.d||"")} · 평균 ${avg.toFixed(1)}점</span></div>
+      <button class="x" title="이 응답 지우기" onclick="delOne('${esc(r.id)}')">✕</button></div>`;
+  }).join("");
+}
+function delOne(id){
+  if(!confirm("이 응답을 지울까요? 되돌릴 수 없어요.")) return;
+  responses = responses.filter(r=>r.id!==id); saveJSON(KEY_R, responses);
+  if(!notes.touched) redraft(true);
+  renderReport(); refreshCounters();
+}
+function clearAll(){
+  if(!confirm("모인 응답을 전부 지울까요? 되돌릴 수 없어요.\n먼저 '백업 내보내기'를 해두시길 권합니다.")) return;
+  responses = []; saveJSON(KEY_R, responses);
+  notes = { good:"", improve:"", pledge:"", touched:false }; saveJSON(KEY_N, notes);
+  renderReport(); refreshCounters();
+}
+function exportBackup(){
+  const data = { app:"satisfaction-survey", saved:new Date().toISOString(), meta, notes, responses };
+  const blob = new Blob([JSON.stringify(data,null,2)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `부모만족도_백업_${(meta.org||"어린이집")}_${new Date().toISOString().slice(0,10)}.json`;
+  a.click(); setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
+}
+function importBackup(file){
+  if(!file) return;
+  const fr = new FileReader();
+  fr.onload = () => {
+    try{
+      const d = JSON.parse(fr.result);
+      if(!d || !Array.isArray(d.responses)) throw new Error("백업 파일이 아니에요.");
+      let added = 0;
+      d.responses.forEach(p=>{ if(p && p.id && !responses.some(r=>r.id===p.id)){ responses.push(p); added++; } });
+      if(d.meta) { meta = Object.assign(meta, d.meta); saveJSON(KEY_M, meta); }
+      if(d.notes) { notes = Object.assign(notes, d.notes); saveJSON(KEY_N, notes); }
+      saveJSON(KEY_R, responses);
+      renderAdmin(); renderReport();
+      log("ok", `✅ 백업에서 ${added}건을 불러왔어요.`);
+    }catch(e){ alert("불러오지 못했어요: " + ((e&&e.message)||e)); }
+  };
+  fr.readAsText(file);
+}
+
+/* ================== 집계 ================== */
+/* 모든 응답에 들어있는 영역 이름을 처음 나온 순서대로 모읍니다.
+   (문항을 도중에 바꿔서 영역이 다른 응답이 섞여도 어느 것도 빠지지 않게 합니다) */
+function areaNames(){
+  const out = [];
+  responses.forEach(function(r){
+    if(Array.isArray(r.an)) r.an.forEach(function(n){ if(out.indexOf(n) < 0) out.push(n); });
+  });
+  return out.length ? out : CONFIG.areas.map(a=>a.name);
+}
+/* 응답마다 영역 구성이 다르면 true — 화면에 알려줍니다 */
+function hasMixedAreas(){
+  if(responses.length < 2) return false;
+  const key = r => (Array.isArray(r.an) ? r.an.join("|") : "");
+  const first = key(responses[0]);
+  return responses.some(r => key(r) !== first);
+}
+function areaColor(name, i){
+  const found = CONFIG.areas.find(a=>a.name===name);
+  return found ? found.color : ["#9ed6c4","#f0a868","#cdb4e6","#f2d16b","#3f9c53","#8fb8de"][i % 6];
+}
+
+function stats(){
+  const names = areaNames();
+  const areaAcc = {}; names.forEach(n=>areaAcc[n]={sum:0,cnt:0});
+  const qAcc = {};        // "영역||순번" → {sum,cnt}
+  const roles = {}, ages = {}, freqs = {};
+  const open1=[], open2=[], cheers=[];
+
+  responses.forEach(r=>{
+    const an = Array.isArray(r.an)&&r.an.length ? r.an : names;
+    const ac = Array.isArray(r.ac)&&r.ac.length ? r.ac : CONFIG.areas.map(a=>a.items.length);
+    let k = 0;
+    an.forEach((nm, ai)=>{
+      const cnt = ac[ai] || 0;
+      if(!areaAcc[nm]) areaAcc[nm] = {sum:0,cnt:0};
+      for(let j=0;j<cnt;j++){
+        const v = r.s[k++];
+        if(typeof v === "number" && v>0){
+          areaAcc[nm].sum += v; areaAcc[nm].cnt++;
+          const key = nm + "||" + j;
+          if(!qAcc[key]) qAcc[key] = {sum:0,cnt:0,area:nm,idx:j};
+          qAcc[key].sum += v; qAcc[key].cnt++;
+        }
+      }
+    });
+    if(r.r) roles[r.r] = (roles[r.r]||0)+1;
+    if(r.g) ages[r.g] = (ages[r.g]||0)+1;
+    if(r.f) freqs[r.f] = (freqs[r.f]||0)+1;
+    if(r.m1 && r.m1.trim()) open1.push({who:r.r||"", text:r.m1.trim()});
+    if(r.m2 && r.m2.trim()) open2.push({who:r.r||"", text:r.m2.trim()});
+    if(r.ch && r.ch.trim()) cheers.push({who:r.r||"", text:r.ch.trim()});
+  });
+
+  const areas = names.map((n,i)=>{
+    const a = areaAcc[n] || {sum:0,cnt:0};
+    return { name:n, color:areaColor(n,i), value: a.cnt ? a.sum/a.cnt : null };
+  });
+  const valid = areas.filter(a=>a.value !== null);
+  // 전체 평균 = 영역 평균들의 평균 (결과지 양식과 같은 방식)
+  const total = valid.length ? valid.reduce((s,a)=>s+a.value,0)/valid.length : null;
+
+  const copies = parseInt(meta.copies,10);
+  const rate = (copies>0) ? Math.round(responses.length/copies*100) : null;
+
+  const questions = Object.values(qAcc).map(q=>({
+    area:q.area, idx:q.idx, value:q.cnt ? q.sum/q.cnt : null,
+    text: questionText(q.area, q.idx)
+  }));
+
+  return { areas, total, rate, copies: copies>0?copies:null, roles, ages, freqs, open1, open2, cheers, questions };
+}
+function questionText(areaName, idx){
+  const a = CONFIG.areas.find(x=>x.name===areaName);
+  if(a && a.items[idx]) return CONFIG.itemQ(a.items[idx]);
+  return areaName + " " + (idx+1) + "번 문항";
+}
+
+/* ================== 자동 초안 ================== */
+function redraft(silent){
+  const st = stats();
+  const valid = st.areas.filter(a=>a.value!==null);
+  if(!valid.length){
+    notes.good = ""; notes.improve = ""; notes.pledge = "";
+  } else {
+    const sorted = valid.slice().sort((a,b)=>b.value-a.value);
+    const top = sorted[0], low = sorted[sorted.length-1];
+    const second = sorted.length > 2 ? sorted[1] : null;
+    const g = [];
+    g.push(`${top.name} ${top.value.toFixed(1)}점으로 가장 높게 나타남`);
+    if(second) g.push(`${second.name} ${second.value.toFixed(1)}점으로 높은 만족도를 보임`);
+    const rest = sorted.slice(second ? 2 : 1, sorted.length - 1);
+    if(rest.length){
+      const minRest = Math.min.apply(null, rest.map(a=>a.value));
+      g.push(`${rest.map(a=>a.name).join(", ")}도 ${minRest.toFixed(1)}점 이상의 양호한 평가를 받음`);
+    }
+    notes.good = g.map(t=>"- "+t).join("\n");
+
+    const im = [];
+    im.push(`${low.name} 영역이 ${low.value.toFixed(1)}점으로 다른 영역에 비해 상대적으로 낮게 나타남`);
+    const lowQ = st.questions.filter(q=>q.value!==null).sort((a,b)=>a.value-b.value)[0];
+    if(lowQ) im.push(`가장 낮은 문항: ${shorten(lowQ.text,42)} (${lowQ.value.toFixed(1)}점)`);
+    im.push(`(부모님 의견을 참고해 이 줄을 고쳐 적어주세요)`);
+    notes.improve = im.map(t=>"- "+t).join("\n");
+
+    notes.pledge = [
+      `${low.name} 영역을 높이기 위한 교직원 교육을 강화하겠습니다`,
+      `영유아 개개인의 특성을 반영한 지도 방안을 마련하겠습니다`,
+      `가정과의 소통을 확대하여 자녀의 어린이집 생활을 상세히 안내하겠습니다`
+    ].join("\n");
+  }
+  notes.touched = false;
+  saveJSON(KEY_N, notes);
+  if(!silent) renderReport();
+}
+function shorten(s,n){ s=String(s||""); return s.length>n ? s.slice(0,n)+"…" : s; }
+
+/* ================== 그래프 ================== */
+function barChart(data, opt){
+  const W = opt.w, H = opt.h || 190;
+  const padL = 26, padR = 10, padT = 18, padB = 34;
+  const plotW = W - padL - padR, plotH = H - padT - padB;
+  const MAX = 5;
+  const yOf = v => padT + plotH - (v / MAX) * plotH;
+  let g = "";
+  for(let t=0;t<=5;t++){
+    const y = yOf(t);
+    g += `<line x1="${padL}" y1="${y.toFixed(1)}" x2="${(W-padR).toFixed(1)}" y2="${y.toFixed(1)}" stroke="${t===0?'#98a2ac':'#e8ecf0'}" stroke-width="${t===0?1:0.8}"/>`;
+    g += `<text x="${padL-6}" y="${(y+3.2).toFixed(1)}" font-size="8" fill="#8b929a" text-anchor="end">${t}</text>`;
+  }
+  const slot = plotW / data.length;
+  const bw = Math.min(38, slot * 0.52);
+  data.forEach((d,i)=>{
+    const cx = padL + slot*i + slot/2;
+    const v = (d.value === null || d.value === undefined) ? 0 : d.value;
+    const y = yOf(v), h = Math.max(0, padT + plotH - y);
+    g += `<rect x="${(cx-bw/2).toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" fill="${d.color}" rx="1.5"/>`;
+    if(d.value !== null && d.value !== undefined)
+      g += `<text x="${cx.toFixed(1)}" y="${(y-4).toFixed(1)}" font-size="8.5" fill="#5a6470" text-anchor="middle" font-weight="700">${d.value.toFixed(1)}</text>`;
+    const label = String(d.name);
+    g += `<text x="${cx.toFixed(1)}" y="${(H-padB+14).toFixed(1)}" font-size="8" fill="#5a6470" text-anchor="middle">${escSvg(label)}</text>`;
+  });
+  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img">${g}</svg>`;
+}
+
+/* ================== 결과지 ================== */
+function renderReport(){
+  const st = stats();
+  const org = meta.org || "○○어린이집";
+  const n = responses.length;
+
+  /* --- 항목별 평균 표: 2단 --- */
+  const cells = st.areas.map(a=>({ name:a.name, v:a.value }));
+  cells.push({ name:"전체 만족도 평균", v: st.total, strong:true });
+  let rows = "";
+  for(let i=0;i<cells.length;i+=2){
+    const a = cells[i], b = cells[i+1];
+    rows += `<tr>
+      <td${a.strong?' class="strong"':''}>${esc(a.name)}</td><td${a.strong?' class="strong"':''}>${a.v===null?'-':a.v.toFixed(1)}</td>
+      ${b ? `<td${b.strong?' class="strong"':''}>${esc(b.name)}</td><td${b.strong?' class="strong"':''}>${b.v===null?'-':b.v.toFixed(1)}</td>`
+          : `<td></td><td></td>`}
+    </tr>`;
+  }
+
+  const chartMain = barChart(st.areas.map(a=>({name:a.name, value:a.value, color:a.color})), {w:430, h:190});
+  const chartTot  = barChart([{name:"전체 만족도 평균", value:st.total, color:CONFIG.report.totalColor}], {w:150, h:190});
+
+  const resultLine = `부모 총 ${n}명 / 배부 ${st.copies !== null ? st.copies : "-"}부 / 회신 ${n}명` + (st.rate!==null ? ` (회신율 ${st.rate}%)` : "");
+
+  /* --- 별지: 수요조사·주관식 --- */
+  const freqRows = Object.keys(st.freqs).length
+    ? CONFIG.extra.frequency.options.concat(Object.keys(st.freqs).filter(k=>!CONFIG.extra.frequency.options.includes(k)))
+        .filter((v,i,arr)=>arr.indexOf(v)===i)
+        .map(o=>{ const c = st.freqs[o]||0; return `<tr><td>${esc(o)}</td><td>${c}명</td><td>${n?Math.round(c/n*100):0}%</td></tr>`; }).join("")
+    : "";
+
+  const qRows = st.questions.map(q=>`<tr><td style="text-align:left">${esc(q.area)}</td><td style="text-align:left">${esc(shorten(q.text,46))}</td><td>${q.value===null?'-':q.value.toFixed(1)}</td></tr>`).join("");
+
+  const freeBlock = (title, arr) => `
+    <div class="sechead">${esc(title)}</div>
+    ${arr.length ? arr.map(o=>`<div class="freeitem"><span class="who">${esc(o.who||"학부모")}</span>${esc(o.text)}</div>`).join("")
+                 : '<div class="emptynote">응답 없음</div>'}`;
+
+  const distRow = (obj) => Object.keys(obj).length
+      ? Object.keys(obj).map(k=>`${esc(k)} ${obj[k]}명`).join(" · ") : "-";
+
+  $("report").innerHTML = `
+  <div class="paper-scroll">
+
+    <!-- ===== 1쪽: 결과지 ===== -->
+    <div class="page">
+      <h1>${esc(meta.year)}년 ${esc(org)} 부모만족도 조사결과 안내</h1>
+
+      <div class="ov"><span class="k">□ 조사기간 :</span><span class="v">${esc(meta.period||"-")}</span></div>
+      <div class="ov"><span class="k">□ 조사방법 :</span><span class="v">${esc(meta.method||"-")}</span></div>
+      <div class="ov"><span class="k">□ 결과 :</span><span class="v">${esc(resultLine)}</span></div>
+      <div class="ov"><span class="k">□ 점수배치 :</span><span class="v">${esc(CONFIG.report.scoreNote)}</span></div>
+
+      <div class="caption">&lt;부모만족도 항목결과 : 5점 만점으로 하는 평균 점수&gt;</div>
+      <table class="rt">
+        <thead><tr><th style="width:28%">조사항목</th><th style="width:22%">평균점수</th><th style="width:28%">조사항목</th><th style="width:22%">평균점수</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+
+      <div class="charts">
+        <div class="chartbox main">${chartMain}</div>
+        <div class="chartbox total">${chartTot}</div>
+      </div>
+
+      <div class="twocol">
+        <div class="left">
+          <table class="remark">
+            <thead><tr><th colspan="2">비고</th></tr></thead>
+            <tbody>
+              <tr><td class="lab">잘된 점</td>
+                  <td><div contenteditable="true" data-note="good" oninput="noteEdit(this)" style="white-space:pre-wrap">${esc(notes.good||"응답이 모이면 자동으로 채워집니다.")}</div></td></tr>
+              <tr><td class="lab">개선 의견</td>
+                  <td><div contenteditable="true" data-note="improve" oninput="noteEdit(this)" style="white-space:pre-wrap">${esc(notes.improve||"응답이 모이면 자동으로 채워집니다.")}</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="right">
+          <ul id="pledgeList" contenteditable="true" oninput="pledgeEdit(this)">${(notes.pledge||"").split("\n").filter(x=>x.trim()).map(x=>`<li>${esc(x)}</li>`).join("") || "<li>개선 계획을 적어주세요</li>"}</ul>
+          <div class="thanks">${esc((CONFIG.report.thanks||"").replace(/\{원\}/g, org))}</div>
+        </div>
+      </div>
+      <p class="editnote noprint">✍️ 회색 칸(잘된 점·개선 의견)은 <b>클릭해서 바로 고쳐 쓸 수 있습니다.</b> 고친 내용은 자동 저장돼요.</p>
+    </div>
+
+    <!-- ===== 2쪽: 별지 (내용이 길면 여러 쪽으로 이어짐) ===== -->
+    <div class="page flow">
+     <table class="flowtbl"><thead><tr><td class="sp"></td></tr></thead>
+     <tbody><tr><td>
+      <h1>${esc(meta.year)}년 ${esc(org)} 부모만족도 조사 — 상세 자료</h1>
+
+      <div class="sechead">응답자 현황</div>
+      <div class="ov"><span class="k">참여자 :</span><span class="v">${esc(distRow(st.roles))}</span></div>
+      <div class="ov"><span class="k">자녀 연령 :</span><span class="v">${esc(distRow(st.ages))}</span></div>
+
+      <div class="sechead">문항별 평균 점수</div>
+      ${qRows ? `<table class="rt"><thead><tr><th style="width:20%">영역</th><th>문항</th><th style="width:14%">평균</th></tr></thead><tbody>${qRows}</tbody></table>`
+              : '<div class="emptynote">응답 없음</div>'}
+
+      <div class="sechead">${esc(CONFIG.extra.frequency.question)}</div>
+      ${freqRows ? `<table class="rt"><thead><tr><th>보기</th><th style="width:20%">응답 수</th><th style="width:20%">비율</th></tr></thead><tbody>${freqRows}</tbody></table>`
+                 : '<div class="emptynote">응답 없음</div>'}
+
+      ${freeBlock(CONFIG.extra.open1, st.open1)}
+      ${freeBlock(CONFIG.extra.open2, st.open2)}
+      ${freeBlock("💌 " + CONFIG.extra.cheerTitle, st.cheers)}
+     </td></tr></tbody>
+     <tfoot><tr><td class="sp"></td></tr></tfoot></table>
+    </div>
+
+  </div>`;
+}
+
+function noteEdit(el){
+  const k = el.getAttribute("data-note");
+  notes[k] = el.innerText;
+  notes.touched = true;
+  saveJSON(KEY_N, notes);
+}
+function pledgeEdit(el){
+  notes.pledge = el.innerText.split("\n").map(x=>x.trim()).filter(Boolean).join("\n");
+  notes.touched = true;
+  saveJSON(KEY_N, notes);
+}
+
+/* ================== 유틸 ================== */
+function esc(s){
+  return String(s===undefined||s===null?"":s)
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+}
+function escSvg(s){ return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+renderGate();
+</script>
+</body>
+</html>
