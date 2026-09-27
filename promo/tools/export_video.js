@@ -19,8 +19,8 @@ const FPS = 30, DUR = 64;
   });
   console.log('fonts', await p.evaluate(() => [...document.fonts].filter(f => f.status === 'loaded').length), 'total', await p.evaluate(() => window.__reels.total()));
   const ff = spawn(FF, ['-y','-loglevel','error','-f','image2pipe','-framerate',String(FPS),'-c:v','mjpeg','-i','-',
-    '-i','bgm.m4a','-map','0:v','-map','1:a','-c:v','libx264','-preset','medium','-crf','19','-pix_fmt','yuv420p',
-    '-profile:v','high','-r',String(FPS),'-c:a','copy','-shortest','-movflags','+faststart',OUT], { stdio: ['pipe','inherit','inherit'] });
+    '-i','bgm.mp3','-map','0:v','-map','1:a','-c:v','libx264','-preset','medium','-crf','19','-pix_fmt','yuv420p',
+    '-profile:v','high','-r',String(FPS),'-c:a','aac','-b:a','160k','-shortest','-movflags','+faststart',OUT], { stdio: ['pipe','inherit','inherit'] });
   const n = FPS * DUR, t0 = Date.now();
   for (let i = 0; i < n; i++) {
     await p.evaluate(t => window.__reels.at(t), i / FPS);

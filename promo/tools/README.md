@@ -7,7 +7,7 @@ pip install numpy imageio-ffmpeg
 npm i playwright-core @fontsource/nanum-gothic @fontsource/gowun-dodum
 python3 make_music.py                                   # bgm.wav 생성 (직접 합성한 피아노 음악)
 FF=$(python3 -c "import imageio_ffmpeg as f;print(f.get_ffmpeg_exe())")
-$FF -y -i bgm.wav -c:a aac -b:a 160k bgm.m4a
+$FF -y -i bgm.wav -c:a libmp3lame -b:a 160k bgm.mp3
 node export_video.js $FF ../chungju-reels.html ../chungju-reels.mp4
 ```
 
