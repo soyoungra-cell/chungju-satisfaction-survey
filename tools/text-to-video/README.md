@@ -30,3 +30,15 @@ python3 cards_to_video.py cards/*.png -o reels.mp4 --sec 6 --music 음악.mp3
 ```bash
 python3 make_video.py chungju_script.txt --theme light --bright -o 충주어린이집_텍스트영상.mp4
 ```
+
+## 에디토리얼 스토리 영상 (story_video.py)
+
+인스타그램 게시물(4:5, 1080×1350)용 차분한 영상입니다. 글이 흐릿하게 나타나며 또렷해지고,
+선으로 그린 손그림이 그려지듯 나타납니다. 잔잔한 피아노 음악을 직접 합성합니다.
+
+```bash
+python3 story_video.py --cover 표지사진.png --logo 로고.png -o story.mp4
+python3 story_video.py --cover 표지사진.png --logo 로고.png --only 3   # 3번 장면만 확인
+```
+
+장면 글·그림은 `build_scenes()`에서 고칩니다. 글꼴은 Pretendard(OFL, `fonts/`)를 씁니다.
