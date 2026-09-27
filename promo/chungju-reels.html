@@ -1,0 +1,673 @@
+<title>충주어린이집 원아모집 영상</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Nanum+Gothic:wght@400;700;800&display=swap">
+<style>
+/* ─────────────────────────────────────────────
+   색 · 글꼴 토큰 (화이트 + 베이지 + 차분한 블루)
+   ───────────────────────────────────────────── */
+:root{
+  --white:#FFFFFF;
+  --paper:#F8F5EF;
+  --beige:#EADFCC;
+  --sand:#C9B596;
+  --blue:#3D5F80;
+  --blue-soft:#8FA8C0;
+  --navy:#1F3246;
+  --ink:#222B34;
+  --muted:#6D7580;
+  --page:#E7E2D9;
+  --ease:cubic-bezier(.22,.61,.36,1);
+  --f-bold:"Nanum Gothic","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;
+  --f-reg:"Gowun Dodum","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;
+  color-scheme:light;
+}
+html,body{height:100%}
+body{
+  margin:0;background:var(--page);color:var(--ink);font-family:var(--f-reg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+  padding-inline:16px;box-sizing:border-box;overflow:hidden;
+}
+
+/* ── 영상 프레임 (1080×1920 기준, 화면에 맞게 축소) ── */
+.frame{position:relative;border-radius:18px;overflow:hidden;background:var(--paper);
+  box-shadow:0 24px 60px rgba(31,50,70,.18),0 2px 6px rgba(31,50,70,.08)}
+#stage{position:absolute;top:0;left:0;width:1080px;height:1920px;transform-origin:0 0;
+  overflow:hidden;background:var(--paper);cursor:pointer;-webkit-user-select:none;user-select:none}
+
+/* ── 장면 ── */
+.scene{position:absolute;inset:0;opacity:0;transition:opacity .01s linear 1.2s;
+  --fg:var(--ink);--fg2:var(--muted);--accent:var(--blue);--mark:var(--beige);color:var(--fg)}
+.scene.on{opacity:1;transition:opacity 1.2s var(--ease)}
+.scene.paper{background:var(--paper)}
+.scene.white{background:var(--white)}
+.scene.dark{background:var(--navy);--fg:#FFFFFF;--fg2:rgba(255,255,255,.8);--accent:#F1E6D2;--mark:rgba(234,223,204,.34)}
+.scene.grid{--line:rgba(61,95,128,.07);
+  background:linear-gradient(var(--line) 1px,transparent 1px) 0 0/100% 120px,
+             linear-gradient(90deg,var(--line) 1px,transparent 1px) 0 0/120px 100%,var(--white)}
+
+/* 다시보기 시 되감기 모션이 보이지 않도록 */
+.reset,.reset *,.reset *::after,.reset *::before{transition:none!important}
+
+/* ── 사진 & 자리표시 ── */
+.photo{position:absolute;overflow:hidden;background:var(--beige)}
+.photo.full{inset:0}
+.photo .img{position:absolute;inset:-3%;background-size:cover;background-position:center;will-change:transform}
+.ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:16px;text-align:center;color:#8A7458;padding:40px;box-sizing:border-box;
+  background:repeating-linear-gradient(135deg,rgba(201,181,150,.2) 0 2px,transparent 2px 24px),
+             linear-gradient(160deg,#F1E8D9,#E2D4BD)}
+.ph svg{width:96px;height:96px;fill:none;stroke:currentColor;stroke-width:1.6;opacity:.65}
+.ph b{font:800 36px/1.3 var(--f-bold);letter-spacing:-.02em}
+.ph small{font:400 25px/1.45 var(--f-reg);opacity:.85;max-width:560px}
+.photo.full .ph{justify-content:flex-start;padding-top:150px}
+.photo.full .ph svg{width:120px;height:120px}
+.photo.has .ph{display:none}
+
+.shade{position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(180deg,rgba(20,34,50,.10) 0%,rgba(20,34,50,.30) 40%,rgba(18,30,44,.84) 100%)}
+.shade.even{background:linear-gradient(180deg,rgba(20,34,50,.30) 0%,rgba(20,34,50,.52) 45%,rgba(18,30,44,.84) 100%)}
+.shade.warm{background:linear-gradient(180deg,rgba(44,36,28,.22) 0%,rgba(44,36,28,.52) 45%,rgba(34,28,22,.86) 100%)}
+
+/* ── 텍스트 레이아웃 ── */
+.pad{position:absolute;inset:0;padding:0 110px;display:flex;flex-direction:column;box-sizing:border-box}
+.pad.bottom{justify-content:flex-end;padding-bottom:430px}
+.pad.center{justify-content:center}
+.pad.top{justify-content:flex-start}
+.pad.mid{align-items:center;text-align:center}
+.layer{position:absolute;inset:0;background:var(--paper)}
+p{margin:0}
+
+/* 핵심 문장 Bold / 설명 문장 Regular */
+.t-hero{font:800 128px/1.22 var(--f-bold);letter-spacing:-.035em}
+.t-xl{font:800 96px/1.28 var(--f-bold);letter-spacing:-.03em}
+.t-l{font:800 80px/1.32 var(--f-bold);letter-spacing:-.03em}
+.t-m{font:800 62px/1.42 var(--f-bold);letter-spacing:-.025em}
+.t-r{font-family:var(--f-reg);font-weight:400;letter-spacing:-.01em;color:var(--fg2)}
+.t-body{font:400 44px/1.62 var(--f-reg);color:var(--fg2)}
+.t-small{font:400 34px/1.5 var(--f-reg);letter-spacing:.03em;color:var(--fg2)}
+.hl{color:var(--accent)}
+.gap-s{height:28px}.gap-m{height:56px}.gap-l{height:90px}
+
+.mark{position:relative;display:inline-block;isolation:isolate}
+.mark::after{content:"";position:absolute;left:-.06em;right:-.06em;bottom:.1em;height:.3em;
+  background:var(--mark);z-index:-1;transform:scaleX(0);transform-origin:left;transition:transform 1s var(--ease) .5s}
+.in .mark::after,.mark.in::after{transform:scaleX(1)}
+
+/* ── 텍스트 모션 (과하지 않게) ── */
+[data-at]{opacity:0;transition:opacity .9s var(--ease),transform 1.15s var(--ease),filter .9s var(--ease)}
+.a-up{transform:translateY(46px)}
+.a-left{transform:translateX(-64px)}
+.a-right{transform:translateX(64px)}
+.a-zoom{transform:scale(.9)}
+.a-big{transform:scale(1.14)}
+.a-soft{filter:blur(14px)}
+.a-grow{transform:scaleY(0);transform-origin:top}
+.a-wide{transform:scaleX(0);transform-origin:left}
+[data-at].in{opacity:1;transform:none;filter:none}
+[data-at].gone{opacity:0;transform:translateY(-26px);filter:none;transition-duration:.6s,.8s,.6s}
+
+/* SCENE 1 */
+.sig{display:flex;align-items:center;gap:22px;margin-top:60px;font:400 36px var(--f-reg);color:var(--fg2);letter-spacing:.04em}
+.sig .rule{width:64px;height:2px;background:currentColor;opacity:.7}
+
+/* SCENE 2 */
+.yr-wrap{transform:translateY(330px);transition:transform 1.5s var(--ease)}
+.yr-wrap.moved{transform:none}
+.yr{font:800 330px/1 var(--f-bold);letter-spacing:-.05em;color:var(--blue);font-variant-numeric:tabular-nums}
+.ruler[data-at]{position:relative;align-self:stretch;height:30px;margin:44px 0 80px;opacity:1;
+  transform:scaleX(0);transform-origin:left;transition:transform 2.4s var(--ease);
+  background:repeating-linear-gradient(90deg,var(--sand) 0 2px,transparent 2px 22px) bottom/100% 14px no-repeat,
+             linear-gradient(var(--sand),var(--sand)) bottom/100% 2px no-repeat}
+.ruler[data-at].in{transform:none}
+.ruler::after{content:"";position:absolute;right:-8px;bottom:-7px;width:16px;height:16px;border-radius:50%;background:var(--blue)}
+
+/* SCENE 3 */
+.ages{position:relative;display:grid;grid-template-columns:repeat(6,1fr);margin-bottom:130px}
+.age{position:relative;display:flex;align-items:baseline;justify-content:center;color:var(--blue)}
+.age b{font:800 112px/1 var(--f-bold);font-variant-numeric:tabular-nums;letter-spacing:-.04em}
+.age span{font:400 38px var(--f-reg);margin-left:4px;color:var(--fg2)}
+.age::after{content:"";position:absolute;left:50%;bottom:-50px;width:14px;height:14px;margin-left:-7px;border-radius:50%;background:var(--blue)}
+.age-line{position:absolute;left:0;right:0;bottom:-44px;height:2px;background:var(--sand)}
+
+/* SCENE 4 */
+.kw-grid{display:grid;grid-template-columns:1fr 1fr;gap:30px 0;margin-bottom:110px}
+.kw{font:800 164px/1.12 var(--f-bold);letter-spacing:-.05em;text-align:center}
+
+/* SCENE 7 · 8 콜라주 */
+.collage{position:absolute;left:60px;right:60px;top:140px;height:1000px;display:grid;
+  grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:16px}
+.tile{position:relative;overflow:hidden;border-radius:6px}
+.tile .photo{inset:0}
+.words{display:grid;grid-template-columns:repeat(3,1fr);gap:18px 0}
+.words p{font:800 62px/1.3 var(--f-bold);letter-spacing:-.03em}
+.pair{position:absolute;left:60px;right:60px;top:140px;height:940px;display:grid;grid-template-columns:1.15fr 1fr;gap:16px}
+.pair .tile:last-child{margin-top:100px}
+.verbs{display:flex;flex-wrap:wrap;gap:10px 44px}
+.verbs p{font:800 62px/1.35 var(--f-bold);letter-spacing:-.03em}
+
+/* SCENE 9 */
+.flow{display:flex;flex-direction:column;align-items:center}
+.flow .st{font:800 78px/1.2 var(--f-bold);letter-spacing:-.03em;display:flex;align-items:center;gap:18px}
+.flow .st.last{color:var(--blue)}
+.flow .st svg{width:62px;height:62px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.ar{position:relative;width:3px;height:50px;margin:16px 0 22px;background:var(--blue-soft)}
+.ar::after{content:"";position:absolute;left:50%;bottom:0;width:16px;height:16px;
+  border-right:3px solid var(--blue-soft);border-bottom:3px solid var(--blue-soft);transform:translate(-50%,0) rotate(45deg)}
+.awards{position:absolute;left:110px;right:110px;bottom:320px;border-top:2px solid rgba(61,95,128,.2);padding-top:38px;
+  display:flex;flex-direction:column;gap:12px}
+.award{display:flex;align-items:baseline;gap:16px;font:400 36px/1.4 var(--f-reg);color:var(--muted)}
+.award b{font:800 36px var(--f-bold);color:var(--blue);letter-spacing:-.02em}
+.award i{width:10px;height:10px;border-radius:50%;background:var(--sand);align-self:center;flex:none}
+
+/* ── 재생 UI ── */
+.progress{position:absolute;left:0;right:0;bottom:0;height:6px;background:rgba(140,140,140,.22);z-index:5}
+.progress i{display:block;height:100%;width:0;background:var(--blue-soft)}
+.endbtn{position:absolute;left:50%;bottom:190px;z-index:6;transform:translate(-50%,20px);opacity:0;pointer-events:none;
+  display:flex;align-items:center;gap:16px;padding:26px 54px;border:0;border-radius:999px;cursor:pointer;
+  background:rgba(255,255,255,.94);color:var(--navy);font:800 38px var(--f-bold);letter-spacing:-.01em;
+  transition:opacity .8s var(--ease),transform .8s var(--ease);box-shadow:0 10px 30px rgba(0,0,0,.18)}
+.endbtn svg{width:40px;height:40px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round}
+.ended .endbtn{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.pausechip{position:absolute;left:50%;top:50%;z-index:6;transform:translate(-50%,-50%);opacity:0;pointer-events:none;
+  padding:22px 44px;border-radius:999px;background:rgba(20,32,46,.62);color:#fff;font:400 34px var(--f-reg);transition:opacity .3s}
+.paused .pausechip{opacity:1}
+
+.controls{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px}
+.controls button,.panel button,.slot label{font:700 14px var(--f-bold);color:var(--navy);background:var(--white);
+  border:1px solid rgba(31,50,70,.14);border-radius:999px;padding:8px 16px;cursor:pointer}
+.controls button:hover,.panel button:hover,.slot label:hover{border-color:var(--blue)}
+.controls button:focus-visible,.panel button:focus-visible,.endbtn:focus-visible,.slot input:focus-visible+label{outline:2px solid var(--blue);outline-offset:2px}
+.time{font:400 13px var(--f-reg);color:var(--muted);font-variant-numeric:tabular-nums;min-width:84px;text-align:center}
+
+/* ── 사진 넣기 패널 ── */
+.panel[hidden]{display:none}
+.panel{position:fixed;inset:0;z-index:20;background:rgba(31,50,70,.32);display:flex;align-items:center;justify-content:center;padding:16px}
+.panel-card{background:var(--white);border-radius:16px;width:min(520px,100%);max-height:88%;overflow:auto;padding:20px 20px 12px;box-sizing:border-box;
+  box-shadow:0 20px 60px rgba(31,50,70,.25)}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.panel h2{margin:0;font:800 19px var(--f-bold);color:var(--navy)}
+.panel-note{margin:8px 0 14px;font-size:13px;line-height:1.6;color:var(--muted)}
+.slots{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.slot{display:grid;grid-template-columns:44px 1fr auto;align-items:center;gap:12px;padding:10px 0;border-top:1px solid rgba(31,50,70,.08)}
+.slot .thumb{width:44px;height:78px;border-radius:6px;background:#E9DFCE center/cover}
+.slot .meta b{display:block;font:700 14px var(--f-bold);color:var(--ink)}
+.slot .meta span{display:block;font-size:12px;line-height:1.5;color:var(--muted)}
+.slot .acts{display:flex;gap:6px}
+.slot input{position:absolute;width:1px;height:1px;opacity:0}
+.slot .clear{padding:8px 12px}
+
+@media (prefers-reduced-motion:reduce){
+  [data-at],[data-at].gone{transform:none!important;filter:none!important}
+  .yr-wrap{transition:none}
+}
+</style>
+
+<div class="frame" id="frame">
+  <div id="stage" aria-label="충주어린이집 원아모집 홍보영상. 화면을 누르면 일시정지됩니다." role="img">
+    <div class="progress"><i id="bar"></i></div>
+    <div class="pausechip">일시정지 · 누르면 계속</div>
+    <button class="endbtn" id="endReplay" type="button">
+      <svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v4.5h4.5"/></svg>다시보기
+    </button>
+  </div>
+</div>
+
+<div class="controls" id="controls">
+  <button type="button" id="btnPlay">일시정지</button>
+  <button type="button" id="btnReplay">처음부터</button>
+  <button type="button" id="btnPhotos">사진 넣기</button>
+  <span class="time" id="time">0:00 / 0:00</span>
+</div>
+
+<div class="panel" id="panel" hidden>
+  <div class="panel-card" role="dialog" aria-modal="true" aria-labelledby="panelTitle">
+    <div class="panel-head">
+      <h2 id="panelTitle">사진 넣기</h2>
+      <button type="button" id="panelClose">닫기</button>
+    </div>
+    <p class="panel-note">각 자리에 넣을 사진을 고르면 영상에 바로 반영됩니다. 사진은 화면에 맞게 채워지고, 이 브라우저에만 저장됩니다.</p>
+    <ul class="slots" id="slotList"></ul>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════
+   1) 사진 설정 — src에 이미지 주소(또는 data URL)를 넣으면 교체됩니다.
+      비워두면 어떤 사진이 들어갈지 안내하는 자리표시가 보입니다.
+   ═══════════════════════════════════════════════════════ */
+const PHOTOS = {
+  exterior: { scene: 1,  label: '어린이집 전경 사진',        hint: '건물 전경 또는 아이들의 자연스러운 놀이 모습', src: '' },
+  play:     { scene: 4,  label: '아이 놀이 사진',            hint: '아이들이 몰입해 놀이하고 탐색하는 모습',       src: '' },
+  book:     { scene: 5,  label: '그림책 활동 사진',          hint: '그림책 읽기, 질문놀이, 하브루타 장면',          src: '' },
+  yard:     { scene: 6,  label: '마당·자연놀이 사진',        hint: '마당, 산책, 나뭇잎·곤충 관찰',                src: '' },
+  market:   { scene: 7,  label: '시장놀이 사진',             hint: '고르고 사고파는 경험',                        src: '' },
+  cooking:  { scene: 7,  label: '요리 활동 사진',            hint: '만지고 맛보는 경험',                          src: '' },
+  music:    { scene: 7,  label: '음악 활동 사진',            hint: '움직이고 표현하는 경험',                      src: '' },
+  eco:      { scene: 7,  label: '생태체험 사진',             hint: '텃밭, 숲, 생물 관찰',                         src: '' },
+  siblings: { scene: 8,  label: '형님·동생 활동 사진',       hint: '연령이 다른 아이들이 함께하는 모습',          src: '' },
+  friends:  { scene: 8,  label: '친구와 함께하는 사진',      hint: '나누고 도와주며 함께 해결하는 모습',          src: '' },
+  ending:   { scene: 10, label: '아이들 뒷모습·전경 사진',   hint: '함께 걸어가는 뒷모습 또는 어린이집 전경',     src: '' },
+};
+
+/* 전체 속도 — 1이면 약 65초, 0.92이면 약 60초 */
+const TEMPO = 0.92;
+
+/* ═══════════════════════════════════════════════════════
+   2) 장면 — 각 장면은 독립된 섹션입니다.
+      data-at  : 장면 시작 후 등장 시각(초)
+      data-out : 사라지는 시각(초, 선택)
+      data-add : "시각:클래스" — 그 시각에 클래스를 추가
+      a-up / a-left / a-right / a-zoom / a-big / a-soft : 등장 방식
+   ═══════════════════════════════════════════════════════ */
+const SCENES = [
+
+/* SCENE 1 | 오프닝 */
+{ id: 'opening', dur: 5.2, cls: 'dark', html: `
+  <div class="photo full" data-photo="exterior" data-kb="in"></div>
+  <div class="shade"></div>
+  <div class="pad bottom">
+    <p class="t-hero a-up" data-at="0.5">아이의</p>
+    <p class="t-hero a-up" data-at="1.3">오늘과 내일을</p>
+    <p class="t-hero a-up" data-at="2.2"><span class="mark">잇는 곳</span></p>
+    <div class="sig a-left" data-at="3.3"><span class="rule"></span>사회복지법인 충주어린이집</div>
+  </div>` },
+
+/* SCENE 2 | 역사와 신뢰 */
+{ id: 'history', dur: 5.4, cls: 'paper', html: `
+  <div class="pad center mid">
+    <div class="yr-wrap" data-add="1.4:moved">
+      <div class="yr a-big a-soft" data-at="0.2">1957</div>
+    </div>
+    <div class="ruler" data-at="1.5"></div>
+    <p class="t-l a-up" data-at="1.9">1957년부터</p>
+    <p class="t-l a-up" data-at="2.4"><span class="hl">아이 곁</span>을 지켜왔습니다.</p>
+    <div class="gap-m"></div>
+    <p class="t-body a-up" data-at="3.2">충주에서 오랜 시간</p>
+    <p class="t-body a-up" data-at="3.45">아이들의 성장과 함께해 온</p>
+    <p class="t-body a-up" data-at="3.7">사회복지법인 어린이집</p>
+  </div>` },
+
+/* SCENE 3 | 0세부터 7세 */
+{ id: 'ages', dur: 6.2, cls: 'white', html: `
+  <div class="pad top" style="padding-top:330px">
+    <div class="ages">
+      <div class="age-line a-wide" data-at="0.1"></div>
+      ${[0,1,2,3,4,5].map((n,i) => `<div class="age a-up" data-at="${(0.25 + i*0.22).toFixed(2)}"><b>${n}</b><span>세</span></div>`).join('')}
+    </div>
+    <p class="t-xl a-up" data-at="1.8">0세의 품에서</p>
+    <p class="t-xl a-up" data-at="2.3"><span class="hl">7세</span>의 성장까지</p>
+    <div class="gap-l"></div>
+    <p class="t-body a-up" data-at="3.0">영아기의 따뜻한 돌봄에서</p>
+    <p class="t-body a-up" data-at="3.25">유아기의 놀이와 배움,</p>
+    <p class="t-body a-up" data-at="3.5">초등학교를 준비하는 성장까지</p>
+    <div class="gap-m"></div>
+    <p class="t-m a-up" data-at="4.2">하나의 공간에서</p>
+    <p class="t-m a-up" data-at="4.6"><span class="mark">아이의 시간</span>을 이어갑니다.</p>
+  </div>` },
+
+/* SCENE 4 | 놀이 */
+{ id: 'play', dur: 7.6, cls: 'paper', html: `
+  <div class="photo" style="left:0;right:0;top:0;height:1040px" data-photo="play" data-kb="left"></div>
+  <div class="pad top" style="padding-top:1140px">
+    <p class="t-m t-r a-up" data-at="0.4" data-out="3.5">우리는</p>
+    <p class="t-m t-r a-up" data-at="0.8" data-out="3.5">무엇을 얼마나 가르쳤는지보다</p>
+    <div class="gap-s"></div>
+    <p class="t-m a-up" data-at="1.5" data-out="3.5">아이들이</p>
+    <p class="t-m a-up" data-at="1.9" data-out="3.5">무엇을 <span class="mark">발견했는지를</span> 봅니다.</p>
+  </div>
+  <div class="layer a-fade" data-at="3.6">
+    <div class="pad center mid">
+      <div class="kw-grid">
+        <p class="kw a-zoom" data-at="4.0">발견</p>
+        <p class="kw a-zoom" data-at="4.3">질문</p>
+        <p class="kw a-zoom" data-at="4.6">탐색</p>
+        <p class="kw hl a-zoom" data-at="4.9">놀이</p>
+      </div>
+      <p class="t-m t-r a-up" data-at="5.5">놀이는</p>
+      <p class="t-l a-up" style="font-size:70px" data-at="5.9">아이의 가장 <span class="mark">깊은 배움</span>입니다.</p>
+    </div>
+  </div>` },
+
+/* SCENE 5 | 문해력 */
+{ id: 'literacy', dur: 7.2, cls: 'dark', html: `
+  <div class="photo full" data-photo="book" data-kb="out"></div>
+  <div class="shade even"></div>
+  <div class="pad bottom">
+    <p class="t-xl a-up" data-at="0.3" data-out="3.9">글자를 읽기 전부터</p>
+    <p class="t-xl a-up" data-at="0.8" data-out="3.9"><span class="mark">읽기</span>는 시작됩니다.</p>
+    <div class="gap-m"></div>
+    ${['듣고','말하고','질문하고','생각하고','표현하며'].map((w,i) =>
+      `<p class="t-m a-left" style="padding-left:${i*62}px" data-at="${(1.8 + i*0.3).toFixed(2)}" data-out="3.9">${w}</p>`).join('')}
+  </div>
+  <div class="pad bottom">
+    <p class="t-m a-up" style="font-size:70px" data-at="4.2">어휘와 생각의 힘을 키우고</p>
+    <div class="gap-m"></div>
+    <p class="t-m t-r a-up" data-at="4.8">그 힘이</p>
+    <p class="t-m a-up" style="font-size:70px" data-at="5.1"><span class="hl">읽기와 쓰기</span>로 이어집니다.</p>
+    <div class="sig a-left" data-at="5.6"><span class="rule"></span>그림책 질문놀이 · 하브루타</div>
+  </div>` },
+
+/* SCENE 6 | 마당과 자연 */
+{ id: 'yard', dur: 7.4, cls: 'dark', html: `
+  <div class="photo full" data-photo="yard" data-kb="in"></div>
+  <div class="shade even"></div>
+  <div class="pad bottom">
+    <p class="t-l t-r a-up" style="color:var(--fg2)" data-at="0.3" data-out="2.6">교실 밖으로 나오면</p>
+    <p class="t-l a-up" style="font-size:76px" data-at="0.9" data-out="2.6">또 하나의 교실이 열립니다.</p>
+  </div>
+  <div class="pad center mid">
+    <p class="a-big a-soft" style="font:800 300px/1.1 var(--f-bold);letter-spacing:-.06em" data-at="2.8" data-out="5.4">마당</p>
+    <div class="gap-m"></div>
+    <p class="t-m a-up" data-at="3.5" data-out="5.4">계절을 만나고</p>
+    <p class="t-m a-up" data-at="3.9" data-out="5.4">자연을 발견하고</p>
+    <p class="t-m a-up" data-at="4.3" data-out="5.4"><span class="hl">질문</span>이 시작되는 곳</p>
+  </div>
+  <div class="pad center mid">
+    <p class="t-l t-r a-up" data-at="5.6">자연은</p>
+    <p class="t-l a-up" style="font-size:86px" data-at="6.0">살아 있는 <span class="mark">배움터</span>입니다.</p>
+  </div>` },
+
+/* SCENE 7 | 경험 */
+{ id: 'experience', dur: 6.6, cls: 'paper', html: `
+  <div class="collage">
+    <div class="tile a-fade" data-at="0.1"><div class="photo" data-photo="market" data-kb="in"></div></div>
+    <div class="tile a-fade" data-at="0.35"><div class="photo" data-photo="cooking" data-kb="left"></div></div>
+    <div class="tile a-fade" data-at="0.6"><div class="photo" data-photo="music" data-kb="right"></div></div>
+    <div class="tile a-fade" data-at="0.85"><div class="photo" data-photo="eco" data-kb="out"></div></div>
+  </div>
+  <div class="pad top" style="padding-top:1240px">
+    <div class="words">
+      ${['고르고','만지고','맛보고','움직이고','만들고','함께하고'].map((w,i) =>
+        `<p class="a-up${i===5?' hl':''}" data-at="${(0.9 + i*0.28).toFixed(2)}" data-out="3.6">${w}</p>`).join('')}
+    </div>
+  </div>
+  <div class="pad top" style="padding-top:1230px">
+    <p class="t-m t-r a-up" data-at="3.8">설명으로 아는 것보다</p>
+    <div class="gap-s"></div>
+    <p class="t-l a-up" data-at="4.3">직접 경험하며</p>
+    <p class="t-l a-up" data-at="4.7"><span class="mark">배우는 아이들</span></p>
+  </div>` },
+
+/* SCENE 8 | 관계 */
+{ id: 'relation', dur: 6.6, cls: 'paper', html: `
+  <div class="pair">
+    <div class="tile a-fade" data-at="0.1"><div class="photo" data-photo="siblings" data-kb="in"></div></div>
+    <div class="tile a-up" data-at="0.4"><div class="photo" data-photo="friends" data-kb="out"></div></div>
+  </div>
+  <div class="pad top" style="padding-top:1200px">
+    <p class="t-m t-r a-up" data-at="0.5" data-out="2.6">혼자가 아니라</p>
+    <p class="t-l a-up" data-at="1.0" data-out="2.6"><span class="mark">관계</span> 속에서 자랍니다.</p>
+  </div>
+  <div class="pad top" style="padding-top:1180px">
+    <div class="verbs">
+      ${['기다리고','나누고','도와주고','함께 해결하며'].map((w,i) =>
+        `<p class="a-right" data-at="${(2.8 + i*0.32).toFixed(2)}">${w}</p>`).join('')}
+    </div>
+    <div class="gap-m"></div>
+    <p class="t-l a-up" data-at="4.4"><span class="hl">함께 살아가는 힘</span>을<br>배웁니다.</p>
+  </div>` },
+
+/* SCENE 9 | 교사의 전문성 */
+{ id: 'teacher', dur: 6.6, cls: 'grid', html: `
+  <div class="pad top mid" style="padding-top:250px">
+    <div class="flow">
+      <p class="st a-up" data-at="0.2">관찰</p>
+      <div class="ar a-grow" data-at="0.45"></div>
+      <p class="st a-up" data-at="0.7">기록</p>
+      <div class="ar a-grow" data-at="0.95"></div>
+      <p class="st a-up" data-at="1.2">해석</p>
+      <div class="ar a-grow" data-at="1.45"></div>
+      <p class="st a-up" data-at="1.7">지원</p>
+      <div class="ar a-grow" data-at="1.95"></div>
+      <p class="st last a-up" data-at="2.2"><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.4-5.7"/><path d="M20 4v4.5h-4.5"/></svg>다시 관찰</p>
+    </div>
+    <div class="gap-l"></div>
+    <p class="t-m a-up" style="font-size:64px" data-at="2.9">아이를 제대로 보는 것에서</p>
+    <p class="t-xl a-up" style="font-size:92px;color:var(--navy)" data-at="3.4"><span class="mark">교육은 시작됩니다.</span></p>
+  </div>
+  <div class="awards">
+    <p class="award a-up" data-at="4.2"><i></i><span>영유아관찰분석</span><b>전국 대상</b></p>
+    <p class="award a-up" data-at="4.45"><i></i><span>보육과정 컨설팅</span><b>우수상</b></p>
+  </div>` },
+
+/* SCENE 10 | 엔딩 */
+{ id: 'ending', dur: 8.8, cls: 'dark', html: `
+  <div class="photo full" data-photo="ending" data-kb="in"></div>
+  <div class="shade warm"></div>
+  <div class="pad bottom">
+    <p class="t-l a-up" style="font-size:70px" data-at="0.4" data-out="3.6">아이의 <span class="hl">속도</span>를 기다리고</p>
+    <div class="gap-s"></div>
+    <p class="t-l a-up" style="font-size:70px" data-at="1.2" data-out="3.6">아이의 <span class="hl">질문</span>을 따라가며</p>
+    <div class="gap-s"></div>
+    <p class="t-l a-up" style="font-size:70px" data-at="2.0" data-out="3.6">아이의 <span class="hl">성장</span>을 함께합니다.</p>
+  </div>
+  <div class="pad center mid" style="padding-inline:80px;padding-bottom:120px">
+    <p class="t-xl a-up" style="font-size:94px" data-at="3.9">함께 기다리고,</p>
+    <p class="t-xl a-up" style="font-size:94px" data-at="4.5"><span class="mark">함께 걸어가겠습니다.</span></p>
+    <div class="gap-l"></div>
+    <p class="t-small a-up" data-at="5.4">사회복지법인</p>
+    <p class="t-m a-up" style="font-size:58px;letter-spacing:.02em" data-at="5.7">충주어린이집</p>
+  </div>` },
+];
+
+/* ═══════════════════════════════════════════════════════
+   3) 재생 엔진 — 아래는 수정하지 않아도 됩니다.
+   ═══════════════════════════════════════════════════════ */
+const stage = document.getElementById('stage');
+const frame = document.getElementById('frame');
+const controls = document.getElementById('controls');
+const bar = document.getElementById('bar');
+const timeEl = document.getElementById('time');
+const btnPlay = document.getElementById('btnPlay');
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const STORE_KEY = 'chungju-reels-photos';
+
+const PH_ICON = '<svg viewBox="0 0 48 48"><rect x="6" y="10" width="36" height="28" rx="3"/><circle cx="17" cy="20" r="3.5"/><path d="M6 33l11-10 9 8 6-5 10 8"/></svg>';
+
+let TOTAL = 0;
+SCENES.forEach(s => {
+  s.start = TOTAL;
+  s.len = s.dur * TEMPO;
+  TOTAL += s.len;
+  const el = document.createElement('section');
+  el.className = 'scene ' + (s.cls || '');
+  el.dataset.scene = s.id;
+  el.innerHTML = s.html;
+  stage.insertBefore(el, stage.querySelector('.progress'));
+  s.el = el;
+  s.items = [...el.querySelectorAll('[data-at]')].map(n => ({
+    n, at: +n.dataset.at * TEMPO, out: n.dataset.out ? +n.dataset.out * TEMPO : Infinity,
+  }));
+  s.adds = [];
+  el.querySelectorAll('[data-add]').forEach(n => {
+    n.dataset.add.trim().split(/\s+/).forEach(pair => {
+      const [t, c] = pair.split(':');
+      s.adds.push({ n, t: +t * TEMPO, c });
+    });
+  });
+  s.photos = [...el.querySelectorAll('.photo')].map(n => {
+    n.innerHTML = '<div class="img"></div>';
+    return { n, img: n.firstChild, kb: n.dataset.kb || 'in' };
+  });
+});
+
+/* 저장된 사진 불러오기 (이 브라우저에만) */
+try {
+  const saved = JSON.parse(localStorage.getItem(STORE_KEY) || '{}');
+  Object.keys(saved).forEach(k => { if (PHOTOS[k] && saved[k]) PHOTOS[k].src = saved[k]; });
+} catch (e) {}
+
+function paintPhoto(key) {
+  const info = PHOTOS[key];
+  stage.querySelectorAll(`.photo[data-photo="${key}"]`).forEach(n => {
+    const img = n.querySelector('.img');
+    let ph = n.querySelector('.ph');
+    if (info && info.src) {
+      img.style.backgroundImage = `url("${info.src}")`;
+      n.classList.add('has');
+    } else {
+      img.style.backgroundImage = '';
+      n.classList.remove('has');
+      if (!ph) {
+        ph = document.createElement('div');
+        ph.className = 'ph';
+        n.appendChild(ph);
+      }
+      ph.innerHTML = `${PH_ICON}<b>${info ? info.label : '사진'}</b><small>${info ? info.hint : ''}</small>`;
+    }
+  });
+}
+Object.keys(PHOTOS).forEach(paintPhoto);
+
+/* 화면 크기에 맞추기 */
+function fit() {
+  const availW = window.innerWidth - 32;
+  const availH = window.innerHeight - controls.offsetHeight - 14 - 32;
+  const s = Math.max(0.1, Math.min(availW / 1080, availH / 1920));
+  frame.style.width = 1080 * s + 'px';
+  frame.style.height = 1920 * s + 'px';
+  stage.style.transform = `scale(${s})`;
+}
+window.addEventListener('resize', fit);
+fit();
+
+/* 시간 → 화면 상태 */
+function render(T) {
+  const lastIdx = SCENES.length - 1;
+  SCENES.forEach((s, i) => {
+    const t = T - s.start;
+    s.el.classList.toggle('on', t >= 0 && (t < s.len || i === lastIdx));
+    for (const it of s.items) {
+      it.n.classList.toggle('in', t >= it.at && t < it.out);
+      it.n.classList.toggle('gone', t >= it.out);
+    }
+    for (const a of s.adds) a.n.classList.toggle(a.c, t >= a.t);
+    if (!reduceMotion && t > -0.2 && t < s.len + 1.4) {
+      const p = Math.min(1, Math.max(0, t / (s.len + 1.2)));
+      for (const ph of s.photos) {
+        let tf;
+        if (ph.kb === 'out') tf = `scale(${1.1 - 0.08 * p})`;
+        else if (ph.kb === 'left') tf = `scale(1.08) translate3d(${1.8 - 3.6 * p}%,0,0)`;
+        else if (ph.kb === 'right') tf = `scale(1.08) translate3d(${-1.8 + 3.6 * p}%,0,0)`;
+        else tf = `scale(${1.02 + 0.08 * p})`;
+        ph.img.style.transform = tf;
+      }
+    }
+  });
+  bar.style.width = (T / TOTAL * 100).toFixed(3) + '%';
+  timeEl.textContent = `${fmt(T)} / ${fmt(TOTAL)}`;
+}
+const fmt = x => { const s = Math.floor(x); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; };
+
+/* 재생 제어 */
+let T = 0, playing = false, last = performance.now();
+function loop(now) {
+  if (playing) {
+    T += Math.min((now - last) / 1000, 0.1);
+    if (T >= TOTAL) { T = TOTAL; playing = false; stage.classList.add('ended'); updateBtn(); }
+  }
+  last = now;
+  render(T);
+  requestAnimationFrame(loop);
+}
+function seek(x) {
+  stage.classList.add('reset');
+  T = x;
+  render(T);
+  void stage.offsetWidth;
+  requestAnimationFrame(() => requestAnimationFrame(() => stage.classList.remove('reset')));
+}
+function play() { if (T >= TOTAL) return replay(); playing = true; stage.classList.remove('paused', 'ended'); updateBtn(); }
+function pause() { playing = false; stage.classList.add('paused'); updateBtn(); }
+function replay() { stage.classList.remove('ended', 'paused'); seek(0); playing = true; updateBtn(); }
+function updateBtn() { btnPlay.textContent = playing ? '일시정지' : (T >= TOTAL ? '다시보기' : '재생'); }
+
+stage.addEventListener('click', e => {
+  if (e.target.closest('.endbtn')) return;
+  if (T >= TOTAL) return;
+  playing ? pause() : play();
+});
+document.getElementById('endReplay').addEventListener('click', replay);
+btnPlay.addEventListener('click', () => (playing ? pause() : play()));
+document.getElementById('btnReplay').addEventListener('click', replay);
+document.addEventListener('keydown', e => {
+  if (e.target.closest('input,button') || !document.getElementById('panel').hidden) return;
+  if (e.code === 'Space') { e.preventDefault(); playing ? pause() : play(); }
+});
+
+/* #scene5 처럼 링크 끝에 붙이면 해당 장면부터 재생 */
+const m = /^#scene(\d+)$/.exec(location.hash);
+const startAt = m && SCENES[+m[1] - 1] ? SCENES[+m[1] - 1].start : 0;
+seek(startAt);
+requestAnimationFrame(loop);
+let started = false;
+const begin = () => { if (started) return; started = true; setTimeout(() => { playing = true; last = performance.now(); updateBtn(); }, 400); };
+(document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(begin);
+setTimeout(begin, 2500);
+
+/* ═══════════════════════════════════════════════════════
+   4) 사진 넣기 패널
+   ═══════════════════════════════════════════════════════ */
+const panel = document.getElementById('panel');
+const slotList = document.getElementById('slotList');
+let wasPlaying = false;
+
+function buildSlots() {
+  slotList.innerHTML = Object.entries(PHOTOS).map(([k, p]) => `
+    <li class="slot" data-key="${k}">
+      <div class="thumb" style="${p.src ? `background-image:url('${p.src}')` : ''}"></div>
+      <div class="meta"><b>SCENE ${p.scene} · ${p.label}</b><span>${p.hint}</span></div>
+      <div class="acts">
+        <input type="file" accept="image/*" id="file-${k}">
+        <label for="file-${k}">${p.src ? '바꾸기' : '선택'}</label>
+        ${p.src ? `<button type="button" class="clear" data-clear="${k}">지우기</button>` : ''}
+      </div>
+    </li>`).join('');
+}
+function saveStore() {
+  const out = {};
+  Object.entries(PHOTOS).forEach(([k, p]) => { if (p.src && p.src.startsWith('data:')) out[k] = p.src; });
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(out)); } catch (e) {}
+}
+function shrink(file) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      const k = Math.min(1, 1600 / Math.max(img.width, img.height));
+      const c = document.createElement('canvas');
+      c.width = Math.round(img.width * k);
+      c.height = Math.round(img.height * k);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url);
+      resolve(c.toDataURL('image/jpeg', 0.86));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('이미지를 읽을 수 없습니다')); };
+    img.src = url;
+  });
+}
+slotList.addEventListener('change', async e => {
+  const input = e.target.closest('input[type=file]');
+  if (!input || !input.files[0]) return;
+  const key = input.closest('.slot').dataset.key;
+  try {
+    PHOTOS[key].src = await shrink(input.files[0]);
+    paintPhoto(key); saveStore(); buildSlots();
+  } catch (err) {
+    input.closest('.slot').querySelector('.meta span').textContent = '이 파일은 열 수 없습니다. JPG나 PNG 사진을 골라주세요.';
+  }
+});
+slotList.addEventListener('click', e => {
+  const b = e.target.closest('[data-clear]');
+  if (!b) return;
+  PHOTOS[b.dataset.clear].src = '';
+  paintPhoto(b.dataset.clear); saveStore(); buildSlots();
+});
+function openPanel() { wasPlaying = playing; if (playing) pause(); buildSlots(); panel.hidden = false; document.getElementById('panelClose').focus(); }
+function closePanel() { panel.hidden = true; if (wasPlaying) play(); }
+document.getElementById('btnPhotos').addEventListener('click', openPanel);
+document.getElementById('panelClose').addEventListener('click', closePanel);
+panel.addEventListener('click', e => { if (e.target === panel) closePanel(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !panel.hidden) closePanel(); });
+</script>
