@@ -398,6 +398,79 @@ class Rule:
                    fill=th[self.color], width=2 * S)
 
 
+class RichText(Text):
+    """한 줄 안에서 글자 굵기·색을 섞어 쓰는 글. parts = [(글, 굵기, 색이름 또는 'gold'), ...]"""
+
+    def __init__(self, x, y, parts, size=30, t0=0.0, align="left", dur=0.7):
+        super().__init__(x, y, "".join(p[0] for p in parts), size=size, t0=t0, align=align, dur=dur)
+        self.parts = parts
+
+    def prepare(self, th):
+        pad = 30 * S
+        widths = [font(w, self.size).getlength(txt) for txt, w, _ in self.parts]
+        self.tw = sum(widths)
+        h = int(self.size * 1.5 * S)
+        self.layer = Image.new("RGBA", (int(self.tw) + pad * 2, h + pad * 2), (0, 0, 0, 0))
+        d = ImageDraw.Draw(self.layer)
+        x = pad
+        for (txt, w, color), width in zip(self.parts, widths):
+            fill = GOLD if color == "gold" else th[color]
+            d.text((x, pad), txt, font=font(w, self.size), fill=fill + (255,))
+            x += width
+        self.pad = pad
+        if self.tw / S > W - 110:
+            print(f"  경고: 글이 너무 깁니다 → {self.text}")
+        self.blurred = {}
+
+
+class DashedCard:
+    """점선 테두리의 둥근 상자."""
+
+    def __init__(self, x, y, w, h, t0=0.0, radius=26, dash=14, gap=9):
+        self.x, self.y, self.w, self.h, self.t0 = x, y, w, h, t0
+        self.radius, self.dash, self.gap = radius, dash, gap
+
+    def _path(self):
+        x, y, w, h, r = self.x, self.y, self.w, self.h, self.radius
+        pts = circle(x + r, y + r, r, 180, 270, 8) + circle(x + w - r, y + r, r, 270, 360, 8) + \
+            circle(x + w - r, y + h - r, r, 0, 90, 8) + circle(x + r, y + h - r, r, 90, 180, 8)
+        return pts + [pts[0]]
+
+    def draw(self, img, d, t, th):
+        k = ease((t - self.t0) / 0.6)
+        if k <= 0:
+            return
+        a = int(255 * k)
+        d.rounded_rectangle([self.x * S, self.y * S, (self.x + self.w) * S, (self.y + self.h) * S],
+                            radius=self.radius * S, fill=th["card"] + (int(a * 0.85),))
+        # 점선: 경로를 따라 dash 만큼 그리고 gap 만큼 건너뜀 (그려지듯 나타남)
+        pts = self._path()
+        total = sum(math.dist(p, q) for p, q in zip(pts, pts[1:]))
+        limit, pos, on = total * k, 0.0, True
+        seg_left = self.dash
+        cur = [pts[0]]
+        for p, q in zip(pts, pts[1:]):
+            L = math.dist(p, q)
+            used = 0.0
+            while used < L and pos < limit:
+                step = min(seg_left, L - used, limit - pos)
+                used += step
+                pos += step
+                seg_left -= step
+                r = used / L if L else 1
+                pt = (p[0] + (q[0] - p[0]) * r, p[1] + (q[1] - p[1]) * r)
+                if on:
+                    cur.append(pt)
+                if seg_left <= 1e-6:
+                    if on and len(cur) > 1:
+                        d.line([(u * S, v * S) for u, v in cur], fill=th["line"] + (int(a * 0.8),), width=2 * S)
+                    on = not on
+                    seg_left = self.dash if on else self.gap
+                    cur = [pt]
+        if on and len(cur) > 1:
+            d.line([(u * S, v * S) for u, v in cur], fill=th["line"] + (int(a * 0.8),), width=2 * S)
+
+
 class Photo:
     """가운데 가는 띠에서 위아래로 펼쳐지는 사진."""
 
@@ -675,18 +748,36 @@ def build_scenes(cover, logo):
                    (tree(960, GROUND, 120), "line")], t0=2.8)
     scenes.append(("teal", 7.0, els))
 
-    # 12. 마무리 문구
-    els = [Text(W / 2, 430, "오늘의 놀이가", "regular", 60, "text", t0=0.6, align="center"),
-           Text(W / 2, 512, "내일의 꿈이 됩니다", "regular", 60, "text", t0=1.1, align="center"),
-           Text(W / 2, 612, "충주어린이집에서 함께 자라요", "light", 30, "sub", t0=1.8, align="center"),
-           Doodle([[(120, 880), (960, 880)]], t0=1.8, dur=1.2, width=2),
-           Doodle(school(150, 880, 190, 160), t0=2.2, dur=1.4),
-           Doodle(person(460, 880, 120, arms="up") + person(560, 880, 130, arms="up", pigtails=True)
-                  + person(660, 880, 120, arms="up"), t0=2.6, dur=1.6),
-           Doodle(heart(560, 700, 34), t0=3.6, dur=0.5, color="gold"),
-           Doodle(tree(860, 880, 140), t0=3.0, dur=1.0),
-           Doodle(star(760, 730, 14), t0=3.8, dur=0.5, color="gold")]
-    scenes.append(("navy", 5.5, els))
+    # 12. 60개월의 배움
+    swoosh = [(250 + 580 * u, 505 - 22 * math.sin(math.pi * u) + 10 * u) for u in np.linspace(0, 1, 30)]
+    els = [Text(W / 2, 236, "충주어린이집의 약속", "semibold", 26, "sub", t0=0.4, align="center"),
+           Text(W / 2, 296, "60개월의 배움은", "regular", 64, "text", t0=0.7, align="center"),
+           RichText(W / 2, 384, [("꽃을", "semibold", "gold"), (" 피웁니다", "regular", "text")], size=72, t0=1.1,
+                    align="center"),
+           Doodle([swoosh], t0=1.7, dur=0.9, color="gold", width=3),
+           Doodle(flower(850, 470, 100), t0=1.9, dur=1.1, color="gold", width=2),
+           Doodle(star(215, 330, 14) + [[(200, 300), (185, 280)], [(222, 292), (222, 268)], [(240, 300), (255, 282)]],
+                  t0=2.1, dur=0.8, color="line", width=2),
+           DashedCard(110, 570, 860, 100, t0=2.4),
+           Doodle(sprout(165, 640, 46), t0=2.7, dur=0.7, color="gold", width=2),
+           RichText(215, 598, [("만 0~2세에 다진 ", "regular", "text"), ("자기긍정감의 토대", "semibold", "gold"),
+                               (" 위에", "regular", "text")], size=32, t0=2.8),
+           DashedCard(110, 700, 860, 150, t0=3.4),
+           Doodle(sprout(165, 770, 46), t0=3.7, dur=0.7, color="gold", width=2),
+           RichText(215, 728, [("만 3~5세에는 ", "regular", "text"), ("다양한 놀이", "semibold", "gold"),
+                               ("와 ", "regular", "text"), ("체험", "semibold", "gold"), ("을 통해", "regular", "text")],
+                    size=32, t0=3.8),
+           RichText(540, 782, [("배움이 ", "regular", "text"), ("꽃", "semibold", "gold"), ("을 피웁니다.", "regular", "text")],
+                    size=32, t0=4.1, align="center"),
+           # 바닥: 새싹이 자라 꽃이 되는 모습 + 놀이하는 아이들
+           Doodle([[(90, 1080), (990, 1080)]], t0=2.6, dur=1.2, width=2),
+           Doodle(sprout(170, 1080, 36), t0=3.0, dur=0.6, width=2),
+           Doodle(sprout(250, 1080, 62), t0=3.3, dur=0.7, width=2),
+           Doodle(flower(350, 1080, 104), t0=3.6, dur=0.9, color="gold", width=2),
+           Doodle(person(560, 1080, 120, arms="up", pigtails=True) + person(680, 1080, 130, arms="wave"), t0=4.0, dur=1.2, width=2),
+           Doodle(blocks(830, 1080, 34), t0=4.4, dur=0.8, width=2),
+           Doodle(sun(930, 930, 20), t0=4.6, dur=0.6, color="gold", width=2)]
+    scenes.append(("navy", 7.0, els))
 
     # 13. 로고
     els = [Logo(logo, 150, 330, 780, t0=0.5, dur=1.0),
