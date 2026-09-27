@@ -7,7 +7,7 @@
 
 사용법:
     pip install pillow numpy imageio-ffmpeg
-    python3 story_video.py --cover 표지사진.png --logo 로고.png -o story.mp4
+    python3 story_video.py --cover 표지사진.png --logo 로고.png [--bg 배경사진.jpg] -o story.mp4
 """
 import argparse
 import math
@@ -426,6 +426,15 @@ class Photo:
 
 
 class Logo(Photo):
+    def prepare(self, th):
+        super().prepare(th)
+        # 로고 둘레의 흰 바탕을 투명하게 (사진 배경 위에 네모가 뜨지 않도록)
+        a = np.asarray(self.img).astype(np.float32)
+        whiteness = a[..., :3].min(axis=2)
+        alpha = np.clip((255 - whiteness) / 40, 0, 1) * a[..., 3]
+        a[..., 3] = alpha
+        self.img = Image.fromarray(a.astype(np.uint8), "RGBA")
+
     def draw(self, img, d, t, th):
         k = ease((t - self.t0) / self.dur)
         if k <= 0:
@@ -693,16 +702,36 @@ def build_scenes(cover, logo):
 
 # ---------------------------------------------------------------- 렌더링
 
+# 사진 배경 위에 덮는 바탕색의 진하기 (클수록 사진이 옅어짐)
+TINT = {"light": 0.74, "navy": 0.8, "teal": 0.78, "white": 0.82}
+
+
+def backdrop(theme, photo):
+    """장면 바탕: 바탕색 한 장, 또는 흐린 사진 위에 바탕색을 덮은 것. (확대본, 원본크기 배열)"""
+    th = THEMES[theme]
+    if not photo:
+        big = Image.new("RGBA", (W * S, H * S), th["bg"] + (255,))
+        return big, np.broadcast_to(np.array(th["bg"], dtype=np.float32), (H, W, 3))
+    im = Image.open(photo).convert("RGB")
+    scale = max(W / im.width, H / im.height)
+    im = im.resize((int(im.width * scale) + 1, int(im.height * scale) + 1), Image.LANCZOS)
+    left, top = (im.width - W) // 2, (im.height - H) // 2
+    im = im.crop((left, top, left + W, top + H)).filter(ImageFilter.GaussianBlur(14))
+    im = Image.blend(im, Image.new("RGB", (W, H), th["bg"]), TINT[theme])
+    return im.resize((W * S, H * S), Image.BILINEAR).convert("RGBA"), np.asarray(im).astype(np.float32)
+
+
 def render_scene(job):
-    idx, theme, dur, prev_theme, cover, logo, path = job
+    idx, theme, dur, prev_theme, cover, logo, bg_photo, path = job
     scenes = build_scenes(cover, logo)
     _, _, els = scenes[idx]
     th = THEMES[theme]
     for e in els:
         if hasattr(e, "prepare"):
             e.prepare(th)
-    bg = np.array(th["bg"], dtype=np.float32)
-    pbg = np.array(THEMES[prev_theme]["bg"], dtype=np.float32) if prev_theme else bg
+    # 첫 장면(어린이집 사진이 있는 장면)은 바탕색만, 나머지는 흐린 사진 배경
+    cur_big, cur_small = backdrop(theme, bg_photo if idx > 0 else None)
+    prev_big = backdrop(prev_theme, bg_photo if idx > 1 else None)[0] if prev_theme else cur_big
     n = int(dur * FPS)
     writer = imageio_ffmpeg.write_frames(path, (W, H), fps=FPS, codec="libx264", pix_fmt_out="yuv420p",
                                          quality=None, macro_block_size=2, output_params=["-crf", "18"])
@@ -710,17 +739,16 @@ def render_scene(job):
     fade_out = 0.45
     for f in range(n):
         t = f / FPS
-        # 앞 장면 바탕색에서 부드럽게 바뀜
+        # 앞 장면 바탕에서 부드럽게 바뀜
         c = ease(t / 0.4)
-        col = tuple(int(v) for v in pbg * (1 - c) + bg * c)
-        img = Image.new("RGBA", (W * S, H * S), col + (255,))
+        img = cur_big.copy() if c >= 1 else Image.blend(prev_big, cur_big, c)
         d = ImageDraw.Draw(img, "RGBA")
         for e in els:
             e.draw(img, d, t, th)
         frame = np.asarray(img.convert("RGB").resize((W, H), Image.LANCZOS)).astype(np.float32)
         k = (dur - t) / fade_out
         if k < 1:  # 장면 끝에서 내용이 사라짐
-            frame = frame * max(0.0, k) + bg * (1 - max(0.0, k))
+            frame = frame * max(0.0, k) + cur_small * (1 - max(0.0, k))
         writer.send(frame.astype(np.uint8))
     writer.close()
     return idx
@@ -782,6 +810,7 @@ def main():
     ap.add_argument("--logo", required=True, help="마지막 장면 로고 이미지")
     ap.add_argument("-o", "--out", default="story.mp4")
     ap.add_argument("--music", help="직접 준비한 음악 파일. 없으면 피아노 음악 합성")
+    ap.add_argument("--bg", help="첫 장면을 뺀 나머지 장면에 흐리게 깔 배경 사진")
     ap.add_argument("--only", type=int, help="이 번호 장면만 만들기(확인용, 1부터)")
     args = ap.parse_args()
 
@@ -792,7 +821,7 @@ def main():
         if args.only and i + 1 != args.only:
             continue
         prev = scenes[i - 1][0] if i > 0 else None
-        jobs.append((i, theme, dur, prev, args.cover, args.logo, os.path.join(tmp, f"s{i:02d}.mp4")))
+        jobs.append((i, theme, dur, prev, args.cover, args.logo, args.bg, os.path.join(tmp, f"s{i:02d}.mp4")))
     with Pool(min(4, os.cpu_count() or 1)) as pool:
         for i in pool.imap_unordered(render_scene, jobs):
             print(f"장면 {i + 1}/{len(scenes)} 완료")

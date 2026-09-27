@@ -38,6 +38,7 @@ python3 make_video.py chungju_script.txt --theme light --bright -o 충주어린�
 
 ```bash
 python3 story_video.py --cover 표지사진.png --logo 로고.png -o story.mp4
+python3 story_video.py --cover 표지사진.png --logo 로고.png --bg 배경사진.jpg -o story.mp4   # 2번 장면부터 흐린 사진 배경
 python3 story_video.py --cover 표지사진.png --logo 로고.png --only 3   # 3번 장면만 확인
 ```
 
