@@ -483,9 +483,12 @@ def build_scenes(cover, logo):
     h2, y = heading([("아이들의 꿈이", "big"), ("자라는 곳", "big")], y=176, t0=0.8)
     els += h2
     els.append(Text(M, y + 18, "매일이 즐겁고, 성장이 특별한 공간", "light", 30, "sub", t0=1.5))
-    els.append(Photo(cover, M, 420, W - 2 * M, t0=2.0))
-    els += [Text(M, 830, "충주어린이집의 운영철학과 프로그램,", "light", 30, "sub", t0=3.0),
-            Text(M, 874, "지금부터 하나씩 들려드릴게요", "light", 30, "sub", t0=3.25)]
+    photo = Photo(cover, M, 410, W - 2 * M, t0=2.0)
+    cw, ch = Image.open(cover).size
+    below = 410 + (W - 2 * M) * ch / cw + 36   # 사진 높이에 맞춰 아래 글 위치를 정함
+    els.append(photo)
+    els += [Text(M, below, "충주어린이집의 운영철학과 프로그램,", "light", 30, "sub", t0=3.0),
+            Text(M, below + 44, "지금부터 하나씩 들려드릴게요", "light", 30, "sub", t0=3.25)]
     els += ground([(sprout(180, GROUND, 60), "line"), (plane(560, 1120, 34), "line"),
                    (sun(900, 1060, 26), "gold"), (tree(980, GROUND, 110), "line")], t0=2.4)
     scenes.append(("light", 6.3, els))
