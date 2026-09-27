@@ -6,6 +6,8 @@
     python3 make_video.py script.txt -o out.mp4
 
 script.txt 는 빈 줄로 장면을 구분합니다. 첫 장면은 제목으로 크게 표시됩니다.
+줄 앞에 "# " 을 붙이면 큰 제목, "@ " 을 붙이면 작은 꼬리표로 표시됩니다.
+--theme light 는 밝은 바탕, --bright 는 밝은 동요풍 음악입니다.
 배경음악은 저작권 걱정 없이 코드로 직접 합성합니다.
 """
 import argparse
@@ -15,6 +17,8 @@ import wave
 import imageio_ffmpeg
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
+
+from cards_to_video import synth_music as bright_music
 
 W, H, FPS = 1080, 1920, 30
 SR = 44100
@@ -60,14 +64,52 @@ def gradient(top, bottom, shift):
     return np.repeat(col[:, None, :], W, axis=1).astype(np.uint8)
 
 
-def render_scene(text, is_title, palette, n_frames, idx, total):
-    size = 96 if is_title else 68
-    font = ImageFont.truetype(FONT, size)
+THEMES = {
+    # 어두운 바탕 + 흰 글씨
+    "dark": dict(palettes=PALETTES, head=(255, 255, 255), body=(255, 255, 255), label_bg=(255, 255, 255),
+                 label_fg=(40, 60, 110), deco=(255, 255, 255, 18), shadow=True, bar=(255, 255, 255)),
+    # 하늘색·크림색 바탕 + 파란 글씨 (카드뉴스 느낌)
+    "light": dict(palettes=[((232, 243, 255), (196, 222, 250)), ((255, 250, 238), (250, 234, 208)),
+                            ((236, 248, 240), (205, 234, 214)), ((244, 240, 255), (220, 214, 248))],
+                  head=(28, 88, 178), body=(55, 65, 85), label_bg=(40, 105, 200), label_fg=(255, 255, 255),
+                  deco=(255, 255, 255, 110), shadow=False, bar=(40, 105, 200)),
+}
+
+
+def parse(text, is_title):
+    """'# 제목', '@ 작은 꼬리표', 나머지는 본문. 표시가 없으면 예전처럼 동작."""
+    items = []
+    if any(r.startswith(("# ", "@ ")) for r in text.split("\n")):
+        is_title = False
+    for raw in text.split("\n"):
+        if raw.startswith("# "):
+            items.append(("head", raw[2:]))
+        elif raw.startswith("@ "):
+            items.append(("label", raw[2:]))
+        else:
+            items.append(("title" if is_title else "body", raw))
+    return items
+
+
+def render_scene(text, is_title, palette, n_frames, idx, total, theme):
+    th = THEMES[theme]
+    fonts = {k: ImageFont.truetype(FONT, s) for k, s in
+             dict(head=104, title=96, body=58, label=40).items()}
     small = ImageFont.truetype(FONT, 34)
     probe = ImageDraw.Draw(Image.new("RGB", (1, 1)))
-    lines = wrap(probe, text, font, W - 180)
-    line_h = int(size * 1.45)
-    block_h = line_h * len(lines)
+
+    # 줄 단위 배치 계산: (종류, 글자, 높이)
+    rows = []
+    for kind, s in parse(text, is_title):
+        font = fonts[kind]
+        if kind == "label":
+            rows.append((kind, s, 100))
+            continue
+        for ln in wrap(probe, s, font, W - 160):
+            rows.append((kind, ln, int(font.size * (1.3 if kind == "head" else 1.55))))
+        if kind == "head":
+            rows.append(("gap", "", 50))
+    block_h = sum(h for _, _, h in rows)
 
     frames = []
     for f in range(n_frames):
@@ -79,24 +121,40 @@ def render_scene(text, is_title, palette, n_frames, idx, total):
             cx = W * (0.2 + 0.3 * k) + 60 * np.sin(p * 6 + k)
             cy = H * (0.2 + 0.3 * k) + 80 * np.cos(p * 5 + k)
             r = 220 + 40 * k
-            d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=(255, 255, 255, 18))
+            d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=th["deco"])
 
-        fade = min(1.0, f / (FPS * 0.6), (n_frames - f) / (FPS * 0.4))
-        alpha = int(255 * max(0.0, fade))
-        rise = int(40 * (1 - min(1.0, f / (FPS * 0.6))))
-        y = (H - block_h) // 2 + rise
-        for line in lines:
+        out_fade = min(1.0, (n_frames - f) / (FPS * 0.4))
+        y = (H - block_h) // 2 - 40
+        for i, (kind, line, h) in enumerate(rows):
+            # 줄마다 조금씩 늦게 떠오르게
+            local = (f - i * FPS * 0.12) / (FPS * 0.5)
+            fade = max(0.0, min(1.0, local, out_fade))
+            a = int(255 * fade)
+            rise = int(30 * (1 - min(1.0, max(0.0, local))))
+            if kind == "gap" or a == 0:
+                y += h
+                continue
+            font = fonts[kind]
             lw = d.textlength(line, font=font)
             x = (W - lw) / 2
-            d.text((x + 3, y + 3), line, font=font, fill=(0, 0, 0, alpha // 3))
-            d.text((x, y), line, font=font, fill=(255, 255, 255, alpha))
-            y += line_h
+            if kind == "label":
+                d.rounded_rectangle([x - 36, y + rise + 8, x + lw + 36, y + rise + 76], radius=34,
+                                    fill=th["label_bg"] + (a,))
+                d.text((x, y + rise + 18), line, font=font, fill=th["label_fg"] + (a,))
+            else:
+                color = th["head"] if kind in ("head", "title") else th["body"]
+                if th["shadow"]:
+                    d.text((x + 3, y + rise + 3), line, font=font, fill=(0, 0, 0, a // 3))
+                bold = 2 if kind in ("head", "title") else 0
+                d.text((x, y + rise), line, font=font, fill=color + (a,),
+                       stroke_width=bold, stroke_fill=color + (a,))
+            y += h
 
         # 진행 표시줄
         bar = (idx + p) / total
-        d.rectangle([80, H - 140, W - 80, H - 132], fill=(255, 255, 255, 60))
-        d.rectangle([80, H - 140, 80 + (W - 160) * bar, H - 132], fill=(255, 255, 255, 220))
-        d.text((80, H - 120), f"{idx + 1} / {total}", font=small, fill=(255, 255, 255, 180))
+        d.rectangle([80, H - 140, W - 80, H - 132], fill=th["bar"] + (60,))
+        d.rectangle([80, H - 140, 80 + (W - 160) * bar, H - 132], fill=th["bar"] + (220,))
+        d.text((80, H - 120), f"{idx + 1} / {total}", font=small, fill=th["bar"] + (180,))
         frames.append(np.asarray(img))
     return frames
 
@@ -160,20 +218,24 @@ def main():
     ap.add_argument("script")
     ap.add_argument("-o", "--out", default="video.mp4")
     ap.add_argument("--music", help="직접 준비한 음악 파일(mp3/wav). 없으면 자동 합성")
+    ap.add_argument("--theme", choices=THEMES, default="dark", help="dark(기본) 또는 light")
+    ap.add_argument("--bright", action="store_true", help="밝은 동요풍 음악으로 합성")
     args = ap.parse_args()
 
     scenes = read_scenes(args.script)
-    # 글자 수에 비례한 장면 길이 (3~7초)
-    durations = [min(7.0, max(3.0, 1.5 + len(s) * 0.09)) for s in scenes]
+    # 글자 수에 비례한 장면 길이 (3.5~8초)
+    durations = [min(8.0, max(3.5, 1.8 + len(s) * 0.065)) for s in scenes]
     total = sum(durations)
     ffmpeg = imageio_ffmpeg.get_ffmpeg_exe()
 
     silent = args.out + ".video.mp4"
     writer = imageio_ffmpeg.write_frames(silent, (W, H), fps=FPS, codec="libx264",
-                                         pix_fmt_out="yuv420p", quality=8, macro_block_size=8)
+                                         pix_fmt_out="yuv420p", quality=None, macro_block_size=8,
+                                         output_params=["-crf", "21"])
     writer.send(None)
+    pal = THEMES[args.theme]["palettes"]
     for i, (s, dur) in enumerate(zip(scenes, durations)):
-        for fr in render_scene(s, i == 0, PALETTES[i % len(PALETTES)], int(dur * FPS), i, len(scenes)):
+        for fr in render_scene(s, i == 0, pal[i % len(pal)], int(dur * FPS), i, len(scenes), args.theme):
             writer.send(fr)
         print(f"장면 {i + 1}/{len(scenes)} 완료")
     writer.close()
@@ -187,7 +249,8 @@ def main():
             w.setnchannels(1)
             w.setsampwidth(2)
             w.setframerate(SR)
-            w.writeframes(synth_music(total).tobytes())
+            music = bright_music(total) if args.bright else synth_music(total)
+            w.writeframes(music.tobytes())
         audio_args = ["-i", wav]
 
     subprocess.run([ffmpeg, "-y", "-loglevel", "error", "-i", silent, *audio_args,

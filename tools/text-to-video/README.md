@@ -21,3 +21,12 @@ python3 cards_to_video.py cards/*.png -o reels.mp4 --sec 6 --music 음악.mp3
 
 - 카드는 가운데에 온전히 보이고, 위아래 빈 곳은 같은 카드를 흐리게 깔아 채웁니다.
 - 카드가 천천히 확대되고, 다음 카드로 부드럽게 넘어갑니다. 중간 카드는 한 장에 5초(`--sec`)씩 보여줍니다.
+
+## 꾸밈 표시 (make_video.py)
+
+- `# 글` → 큰 제목, `@ 글` → 파란 꼬리표, 나머지 → 본문
+- `--theme light` 하늘색·크림색 바탕에 파란 글씨, `--bright` 밝은 동요풍 음악
+
+```bash
+python3 make_video.py chungju_script.txt --theme light --bright -o 충주어린이집_텍스트영상.mp4
+```
