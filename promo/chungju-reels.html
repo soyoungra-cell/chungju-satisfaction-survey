@@ -40,13 +40,17 @@ body{
   --fg:var(--ink);--fg2:var(--muted);--accent:var(--blue);--mark:var(--beige);color:var(--fg)}
 .scene.paper{background:var(--paper)}
 .scene.white{background:var(--white)}
-.scene.dark{background:var(--navy);--fg:#FFFFFF;--fg2:rgba(255,255,255,.8);--accent:#F1E6D2;--mark:rgba(234,223,204,.34)}
+.scene.dark{background:var(--navy);text-shadow:0 2px 28px rgba(10,20,32,.35);--fg:#FFFFFF;--fg2:rgba(255,255,255,.8);--accent:#F1E6D2;--mark:rgba(234,223,204,.34)}
 .scene.grid{--line:rgba(61,95,128,.07);
   background:linear-gradient(var(--line) 1px,transparent 1px) 0 0/100% 120px,
              linear-gradient(90deg,var(--line) 1px,transparent 1px) 0 0/120px 100%,var(--white)}
 
 /* 다시보기 시 되감기 모션이 보이지 않도록 */
 
+
+.scene.logo{background:#FBFBFB}
+.logo-img{width:940px;max-width:none;display:block}
+.slogan-img{width:880px;max-width:none;display:block}
 
 /* ── 사진 & 자리표시 ── */
 .photo{position:absolute;overflow:hidden;background:var(--beige)}
@@ -65,7 +69,7 @@ body{
 
 .shade{position:absolute;inset:0;pointer-events:none;
   background:linear-gradient(180deg,rgba(20,34,50,.10) 0%,rgba(20,34,50,.30) 40%,rgba(18,30,44,.84) 100%)}
-.shade.even{background:linear-gradient(180deg,rgba(20,34,50,.30) 0%,rgba(20,34,50,.52) 45%,rgba(18,30,44,.84) 100%)}
+.shade.even{background:linear-gradient(180deg,rgba(20,34,50,.46) 0%,rgba(20,34,50,.62) 45%,rgba(18,30,44,.88) 100%)}
 .shade.warm{background:linear-gradient(180deg,rgba(44,36,28,.22) 0%,rgba(44,36,28,.52) 45%,rgba(34,28,22,.86) 100%)}
 
 /* ── 텍스트 레이아웃 ── */
@@ -228,21 +232,21 @@ body.export .controls,body.export .progress,body.export .endbtn,body.export .pau
       비워두면 어떤 사진이 들어갈지 안내하는 자리표시가 보입니다.
    ═══════════════════════════════════════════════════════ */
 const PHOTOS = {
-  exterior: { scene: 1,  label: '어린이집 전경 사진',        hint: '건물 전경 또는 아이들의 자연스러운 놀이 모습', src: '' },
-  play:     { scene: 4,  label: '아이 놀이 사진',            hint: '아이들이 몰입해 놀이하고 탐색하는 모습',       src: '' },
-  book:     { scene: 5,  label: '그림책 활동 사진',          hint: '그림책 읽기, 질문놀이, 하브루타 장면',          src: '' },
-  yard:     { scene: 6,  label: '마당·자연놀이 사진',        hint: '마당, 산책, 나뭇잎·곤충 관찰',                src: '' },
-  market:   { scene: 7,  label: '시장놀이 사진',             hint: '고르고 사고파는 경험',                        src: '' },
-  cooking:  { scene: 7,  label: '요리 활동 사진',            hint: '만지고 맛보는 경험',                          src: '' },
-  music:    { scene: 7,  label: '음악 활동 사진',            hint: '움직이고 표현하는 경험',                      src: '' },
-  eco:      { scene: 7,  label: '생태체험 사진',             hint: '텃밭, 숲, 생물 관찰',                         src: '' },
-  siblings: { scene: 8,  label: '형님·동생 활동 사진',       hint: '연령이 다른 아이들이 함께하는 모습',          src: '' },
-  friends:  { scene: 8,  label: '친구와 함께하는 사진',      hint: '나누고 도와주며 함께 해결하는 모습',          src: '' },
-  ending:   { scene: 10, label: '아이들 뒷모습·전경 사진',   hint: '함께 걸어가는 뒷모습 또는 어린이집 전경',     src: '' },
+  exterior: { scene: 1,  label: '어린이집 전경 사진',        hint: '건물 전경 또는 아이들의 자연스러운 놀이 모습', src: 'photos/forest.jpg' },
+  play:     { scene: 4,  label: '아이 놀이 사진',            hint: '아이들이 몰입해 놀이하고 탐색하는 모습',       src: 'photos/booktower.jpg', pos: '50% 40%' },
+  book:     { scene: 5,  label: '그림책 활동 사진',          hint: '그림책 읽기, 질문놀이, 하브루타 장면',          src: 'photos/picturebook.jpg' },
+  yard:     { scene: 6,  label: '마당·자연놀이 사진',        hint: '마당, 산책, 나뭇잎·곤충 관찰',                src: 'photos/garden.jpg' },
+  market:   { scene: 7,  label: '시장놀이 사진',             hint: '고르고 사고파는 경험',                        src: 'photos/market.jpg', pos: '50% 45%' },
+  cooking:  { scene: 7,  label: '요리 활동 사진',            hint: '만지고 맛보는 경험',                          src: 'photos/cooking.jpg' },
+  music:    { scene: 7,  label: '음악 활동 사진',            hint: '움직이고 표현하는 경험',                      src: 'photos/music.jpg' },
+  eco:      { scene: 7,  label: '함께 만들기 사진',          hint: '가족·친구와 함께 만드는 경험',                src: 'photos/tart.jpg', pos: '60% 50%' },
+  siblings: { scene: 8,  label: '형님·동생 활동 사진',       hint: '연령이 다른 아이들이 함께하는 모습',          src: 'photos/water.jpg', pos: '55% 60%' },
+  friends:  { scene: 8,  label: '친구와 함께하는 사진',      hint: '나누고 도와주며 함께 해결하는 모습',          src: 'photos/together.jpg', pos: '45% 60%' },
+  ending:   { scene: 10, label: '아이들 뒷모습·전경 사진',   hint: '함께 걸어가는 뒷모습 또는 어린이집 전경',     src: 'photos/forest.jpg', pos: '50% 70%' },
 };
 
-/* 전체 속도 — 1이면 약 65초, 0.92이면 약 60초 */
-const TEMPO = 0.92;
+/* 전체 속도 — 0.8924이면 로고까지 63초 */
+const TEMPO = 0.8924;
 
 /* ═══════════════════════════════════════════════════════
    2) 장면 — 각 장면은 독립된 섹션입니다.
@@ -423,7 +427,7 @@ const SCENES = [
   </div>` },
 
 /* SCENE 10 | 엔딩 */
-{ id: 'ending', dur: 8.8, cls: 'dark', html: `
+{ id: 'ending', dur: 7.6, cls: 'dark', html: `
   <div class="photo full" data-photo="ending" data-kb="in"></div>
   <div class="shade warm"></div>
   <div class="pad bottom">
@@ -439,6 +443,14 @@ const SCENES = [
     <div class="gap-l"></div>
     <p class="t-small a-up" data-at="5.4">사회복지법인</p>
     <p class="t-m a-up" style="font-size:58px;letter-spacing:.02em" data-at="5.7">충주어린이집</p>
+  </div>` },
+
+/* SCENE 11 | 로고 */
+{ id: 'logo', dur: 4.2, cls: 'logo', html: `
+  <div class="pad center mid" style="padding-inline:70px">
+    <img class="logo-img a-zoom a-soft" data-at="0.3" src="photos/logo.png" alt="지혜로운 어린이 충주어린이집">
+    <div class="gap-l"></div>
+    <img class="slogan-img a-up" data-at="1.2" src="photos/slogan.png" alt="건강한 가정, 행복한 어린이, 보람있는 교직원">
   </div>` },
 ];
 
@@ -475,7 +487,7 @@ SCENES.forEach(s => {
     const c = it.n.classList;
     it.up = c.contains('a-up'); it.left = c.contains('a-left'); it.right = c.contains('a-right');
     it.zoom = c.contains('a-zoom'); it.big = c.contains('a-big'); it.soft = c.contains('a-soft');
-    it.grow = c.contains('a-grow'); it.wide = c.contains('a-wide'); it.ruler = c.contains('ruler');
+    it.grow = c.contains('a-grow'); it.wide = c.contains('a-wide'); it.ruler = c.contains('ruler'); it.layer = c.contains('layer');
   });
   s.marks = [...el.querySelectorAll('.mark')].map(n => {
     const host = n.closest('[data-at]');
@@ -491,6 +503,8 @@ SCENES.forEach(s => {
   });
 });
 
+Object.values(PHOTOS).forEach(p => { p.def = p.src; });
+
 /* 저장된 사진 불러오기 (이 브라우저에만) */
 try {
   const saved = JSON.parse(localStorage.getItem(STORE_KEY) || '{}');
@@ -504,6 +518,7 @@ function paintPhoto(key) {
     let ph = n.querySelector('.ph');
     if (info && info.src) {
       img.style.backgroundImage = `url("${info.src}")`;
+      img.style.backgroundPosition = info.pos || 'center';
       n.classList.add('has');
     } else {
       img.style.backgroundImage = '';
@@ -541,7 +556,7 @@ const clamp01 = x => (x < 0 ? 0 : x > 1 ? 1 : x);
 const IN = 1.1, OUT = 0.7, XFADE = 1.2;
 
 function drawItem(it, t, end) {
-  const out = Math.min(it.out, end);
+  const out = it.layer ? it.out : Math.min(it.out, end);
   const n = it.n;
   if (t < it.at) { n.style.opacity = 0; return; }
   const e = easeOut(clamp01((t - it.at) / (it.ruler ? 2.4 : IN)));
@@ -681,12 +696,12 @@ let wasPlaying = false;
 function buildSlots() {
   slotList.innerHTML = Object.entries(PHOTOS).map(([k, p]) => `
     <li class="slot" data-key="${k}">
-      <div class="thumb" style="${p.src ? `background-image:url('${p.src}')` : ''}"></div>
+      <div class="thumb" style="${p.src ? `background-image:url(&quot;${p.src}&quot;)` : ''}"></div>
       <div class="meta"><b>SCENE ${p.scene} · ${p.label}</b><span>${p.hint}</span></div>
       <div class="acts">
         <input type="file" accept="image/*" id="file-${k}">
         <label for="file-${k}">${p.src ? '바꾸기' : '선택'}</label>
-        ${p.src ? `<button type="button" class="clear" data-clear="${k}">지우기</button>` : ''}
+        ${p.src !== p.def ? `<button type="button" class="clear" data-clear="${k}">원래대로</button>` : ''}
       </div>
     </li>`).join('');
 }
@@ -726,7 +741,7 @@ slotList.addEventListener('change', async e => {
 slotList.addEventListener('click', e => {
   const b = e.target.closest('[data-clear]');
   if (!b) return;
-  PHOTOS[b.dataset.clear].src = '';
+  PHOTOS[b.dataset.clear].src = PHOTOS[b.dataset.clear].def || '';
   paintPhoto(b.dataset.clear); saveStore(); buildSlots();
 });
 function openPanel() { wasPlaying = playing; if (playing) pause(); buildSlots(); panel.hidden = false; document.getElementById('panelClose').focus(); }

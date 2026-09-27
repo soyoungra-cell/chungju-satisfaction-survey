@@ -1,7 +1,7 @@
 # 잔잔한 피아노 + 패드 배경음악 (직접 합성, 저작권 걱정 없음)
 import numpy as np, wave
 SR=44100; BPM=72; BEAT=60/BPM; BAR=4*BEAT
-TOTAL=64.0
+TOTAL=63.0
 N=int(SR*TOTAL); L=np.zeros(N); Rr=np.zeros(N)
 rng=np.random.default_rng(7)
 def hz(m): return 440*2**((m-69)/12)
@@ -73,7 +73,7 @@ wl=lp(L)+0.45*reverb(L,1); wr=lp(Rr)+0.45*reverb(Rr,2)
 st=np.stack([wl,wr],1)
 t=np.arange(N)/SR
 st*=np.minimum(1,t/1.5)[:,None]
-st*=np.clip((TOTAL-t)/4.0,0,1)[:,None]**1.5
+st*=np.clip((TOTAL-t)/3.0,0,1)[:,None]**1.5
 st/=np.abs(st).max()/0.7
 with wave.open('bgm.wav','wb') as w:
     w.setnchannels(2); w.setsampwidth(2); w.setframerate(SR)
