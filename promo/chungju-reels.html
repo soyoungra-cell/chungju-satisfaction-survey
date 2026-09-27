@@ -36,9 +36,8 @@ body{
   overflow:hidden;background:var(--paper);cursor:pointer;-webkit-user-select:none;user-select:none}
 
 /* ── 장면 ── */
-.scene{position:absolute;inset:0;opacity:0;transition:opacity .01s linear 1.2s;
+.scene{position:absolute;inset:0;opacity:0;
   --fg:var(--ink);--fg2:var(--muted);--accent:var(--blue);--mark:var(--beige);color:var(--fg)}
-.scene.on{opacity:1;transition:opacity 1.2s var(--ease)}
 .scene.paper{background:var(--paper)}
 .scene.white{background:var(--white)}
 .scene.dark{background:var(--navy);--fg:#FFFFFF;--fg2:rgba(255,255,255,.8);--accent:#F1E6D2;--mark:rgba(234,223,204,.34)}
@@ -47,7 +46,7 @@ body{
              linear-gradient(90deg,var(--line) 1px,transparent 1px) 0 0/120px 100%,var(--white)}
 
 /* 다시보기 시 되감기 모션이 보이지 않도록 */
-.reset,.reset *,.reset *::after,.reset *::before{transition:none!important}
+
 
 /* ── 사진 & 자리표시 ── */
 .photo{position:absolute;overflow:hidden;background:var(--beige)}
@@ -91,35 +90,24 @@ p{margin:0}
 
 .mark{position:relative;display:inline-block;isolation:isolate}
 .mark::after{content:"";position:absolute;left:-.06em;right:-.06em;bottom:.1em;height:.3em;
-  background:var(--mark);z-index:-1;transform:scaleX(0);transform-origin:left;transition:transform 1s var(--ease) .5s}
-.in .mark::after,.mark.in::after{transform:scaleX(1)}
+  background:var(--mark);z-index:-1;transform:scaleX(var(--mk,0));transform-origin:left}
 
-/* ── 텍스트 모션 (과하지 않게) ── */
-[data-at]{opacity:0;transition:opacity .9s var(--ease),transform 1.15s var(--ease),filter .9s var(--ease)}
-.a-up{transform:translateY(46px)}
-.a-left{transform:translateX(-64px)}
-.a-right{transform:translateX(64px)}
-.a-zoom{transform:scale(.9)}
-.a-big{transform:scale(1.14)}
-.a-soft{filter:blur(14px)}
-.a-grow{transform:scaleY(0);transform-origin:top}
-.a-wide{transform:scaleX(0);transform-origin:left}
-[data-at].in{opacity:1;transform:none;filter:none}
-[data-at].gone{opacity:0;transform:translateY(-26px);filter:none;transition-duration:.6s,.8s,.6s}
+/* ── 텍스트 모션: 스크립트가 시간에 맞춰 계산 (과하지 않게) ── */
+[data-at]{opacity:0;will-change:opacity,transform}
+.a-grow{transform-origin:top}
+.a-wide{transform-origin:left}
 
 /* SCENE 1 */
 .sig{display:flex;align-items:center;gap:22px;margin-top:60px;font:400 36px var(--f-reg);color:var(--fg2);letter-spacing:.04em}
 .sig .rule{width:64px;height:2px;background:currentColor;opacity:.7}
 
 /* SCENE 2 */
-.yr-wrap{transform:translateY(330px);transition:transform 1.5s var(--ease)}
-.yr-wrap.moved{transform:none}
+.yr-wrap{transform:translateY(330px)}
 .yr{font:800 330px/1 var(--f-bold);letter-spacing:-.05em;color:var(--blue);font-variant-numeric:tabular-nums}
-.ruler[data-at]{position:relative;align-self:stretch;height:30px;margin:44px 0 80px;opacity:1;
-  transform:scaleX(0);transform-origin:left;transition:transform 2.4s var(--ease);
+.ruler[data-at]{position:relative;align-self:stretch;height:30px;margin:44px 0 80px;
+  transform:scaleX(0);transform-origin:left;
   background:repeating-linear-gradient(90deg,var(--sand) 0 2px,transparent 2px 22px) bottom/100% 14px no-repeat,
              linear-gradient(var(--sand),var(--sand)) bottom/100% 2px no-repeat}
-.ruler[data-at].in{transform:none}
 .ruler::after{content:"";position:absolute;right:-8px;bottom:-7px;width:16px;height:16px;border-radius:50%;background:var(--blue)}
 
 /* SCENE 3 */
@@ -131,8 +119,8 @@ p{margin:0}
 .age-line{position:absolute;left:0;right:0;bottom:-44px;height:2px;background:var(--sand)}
 
 /* SCENE 4 */
-.kw-grid{display:grid;grid-template-columns:1fr 1fr;gap:30px 0;margin-bottom:110px}
-.kw{font:800 164px/1.12 var(--f-bold);letter-spacing:-.05em;text-align:center}
+.kw-grid{display:grid;grid-template-columns:auto auto;justify-content:center;gap:24px 96px;margin-bottom:110px}
+.kw{font:800 156px/1.12 var(--f-bold);letter-spacing:-.05em;text-align:center}
 
 /* SCENE 7 · 8 콜라주 */
 .collage{position:absolute;left:60px;right:60px;top:140px;height:1000px;display:grid;
@@ -197,10 +185,10 @@ p{margin:0}
 .slot input{position:absolute;width:1px;height:1px;opacity:0}
 .slot .clear{padding:8px 12px}
 
-@media (prefers-reduced-motion:reduce){
-  [data-at],[data-at].gone{transform:none!important;filter:none!important}
-  .yr-wrap{transition:none}
-}
+/* 영상 파일 추출용 화면 */
+body.export{display:block;padding:0;background:var(--paper)}
+body.export .frame{border-radius:0;box-shadow:none}
+body.export .controls,body.export .progress,body.export .endbtn,body.export .pausechip{display:none}
 </style>
 
 <div class="frame" id="frame">
@@ -213,9 +201,12 @@ p{margin:0}
   </div>
 </div>
 
+<audio id="bgm" src="bgm.m4a" preload="auto"></audio>
+
 <div class="controls" id="controls">
   <button type="button" id="btnPlay">일시정지</button>
   <button type="button" id="btnReplay">처음부터</button>
+  <button type="button" id="btnSound" aria-pressed="false">소리 켜기</button>
   <button type="button" id="btnPhotos">사진 넣기</button>
   <span class="time" id="time">0:00 / 0:00</span>
 </div>
@@ -257,7 +248,7 @@ const TEMPO = 0.92;
    2) 장면 — 각 장면은 독립된 섹션입니다.
       data-at  : 장면 시작 후 등장 시각(초)
       data-out : 사라지는 시각(초, 선택)
-      data-add : "시각:클래스" — 그 시각에 클래스를 추가
+      data-move: "시각:거리" — 그 시각에 제자리로 부드럽게 이동
       a-up / a-left / a-right / a-zoom / a-big / a-soft : 등장 방식
    ═══════════════════════════════════════════════════════ */
 const SCENES = [
@@ -276,7 +267,7 @@ const SCENES = [
 /* SCENE 2 | 역사와 신뢰 */
 { id: 'history', dur: 5.4, cls: 'paper', html: `
   <div class="pad center mid">
-    <div class="yr-wrap" data-add="1.4:moved">
+    <div class="yr-wrap" data-move="1.4:330">
       <div class="yr a-big a-soft" data-at="0.2">1957</div>
     </div>
     <div class="ruler" data-at="1.5"></div>
@@ -462,6 +453,7 @@ const timeEl = document.getElementById('time');
 const btnPlay = document.getElementById('btnPlay');
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const STORE_KEY = 'chungju-reels-photos';
+let exporting = false;
 
 const PH_ICON = '<svg viewBox="0 0 48 48"><rect x="6" y="10" width="36" height="28" rx="3"/><circle cx="17" cy="20" r="3.5"/><path d="M6 33l11-10 9 8 6-5 10 8"/></svg>';
 
@@ -479,12 +471,19 @@ SCENES.forEach(s => {
   s.items = [...el.querySelectorAll('[data-at]')].map(n => ({
     n, at: +n.dataset.at * TEMPO, out: n.dataset.out ? +n.dataset.out * TEMPO : Infinity,
   }));
-  s.adds = [];
-  el.querySelectorAll('[data-add]').forEach(n => {
-    n.dataset.add.trim().split(/\s+/).forEach(pair => {
-      const [t, c] = pair.split(':');
-      s.adds.push({ n, t: +t * TEMPO, c });
-    });
+  s.items.forEach(it => {
+    const c = it.n.classList;
+    it.up = c.contains('a-up'); it.left = c.contains('a-left'); it.right = c.contains('a-right');
+    it.zoom = c.contains('a-zoom'); it.big = c.contains('a-big'); it.soft = c.contains('a-soft');
+    it.grow = c.contains('a-grow'); it.wide = c.contains('a-wide'); it.ruler = c.contains('ruler');
+  });
+  s.marks = [...el.querySelectorAll('.mark')].map(n => {
+    const host = n.closest('[data-at]');
+    return { n, at: host ? +host.dataset.at * TEMPO : 0 };
+  });
+  s.moves = [...el.querySelectorAll('[data-move]')].map(n => {
+    const [t, d] = n.dataset.move.split(':');
+    return { n, t: +t * TEMPO, d: +d };
   });
   s.photos = [...el.querySelectorAll('.photo')].map(n => {
     n.innerHTML = '<div class="img"></div>';
@@ -522,6 +521,7 @@ Object.keys(PHOTOS).forEach(paintPhoto);
 
 /* 화면 크기에 맞추기 */
 function fit() {
+  if (exporting) return;
   const availW = window.innerWidth - 32;
   const availH = window.innerHeight - controls.offsetHeight - 14 - 32;
   const s = Math.max(0.1, Math.min(availW / 1080, availH / 1920));
@@ -532,25 +532,65 @@ function fit() {
 window.addEventListener('resize', fit);
 fit();
 
-/* 시간 → 화면 상태 */
+/* 시간 → 화면 상태
+   모든 움직임을 "시간 T의 함수"로 계산합니다. 그래서 일시정지·다시보기·영상 추출이
+   언제나 같은 화면을 만듭니다. */
+const easeOut = x => 1 - Math.pow(1 - x, 3);
+const smooth = x => x * x * (3 - 2 * x);
+const clamp01 = x => (x < 0 ? 0 : x > 1 ? 1 : x);
+const IN = 1.1, OUT = 0.7, XFADE = 1.2;
+
+function drawItem(it, t, end) {
+  const out = Math.min(it.out, end);
+  const n = it.n;
+  if (t < it.at) { n.style.opacity = 0; return; }
+  const e = easeOut(clamp01((t - it.at) / (it.ruler ? 2.4 : IN)));
+  let op = it.ruler ? 1 : easeOut(clamp01((t - it.at) / 0.9));
+  let x = 0, y = 0, sc = 1, sx = 1, sy = 1, blur = 0;
+  if (!reduceMotion) {
+    if (it.up) y = 46 * (1 - e);
+    if (it.left) x = -64 * (1 - e);
+    if (it.right) x = 64 * (1 - e);
+    if (it.zoom) sc = 0.9 + 0.1 * e;
+    if (it.big) sc = 1.14 - 0.14 * e;
+    if (it.soft) blur = 14 * (1 - op);
+  }
+  if (it.grow) sy = e;
+  if (it.wide || it.ruler) sx = e;
+  if (t >= out) {
+    const g = easeOut(clamp01((t - out) / OUT));
+    op *= 1 - g;
+    if (!reduceMotion) y -= 26 * g;
+  }
+  n.style.opacity = op.toFixed(3);
+  n.style.transform = `translate3d(${x.toFixed(2)}px,${y.toFixed(2)}px,0) scale(${sc.toFixed(4)}) scaleX(${sx.toFixed(4)}) scaleY(${sy.toFixed(4)})`;
+  n.style.filter = blur > 0.05 ? `blur(${blur.toFixed(2)}px)` : 'none';
+}
+
 function render(T) {
   const lastIdx = SCENES.length - 1;
   SCENES.forEach((s, i) => {
     const t = T - s.start;
-    s.el.classList.toggle('on', t >= 0 && (t < s.len || i === lastIdx));
-    for (const it of s.items) {
-      it.n.classList.toggle('in', t >= it.at && t < it.out);
-      it.n.classList.toggle('gone', t >= it.out);
+    const visible = t >= 0 && (t < s.len + XFADE || i === lastIdx);
+    s.el.style.visibility = visible ? 'visible' : 'hidden';
+    if (!visible) return;
+    s.el.style.opacity = (i === 0 ? smooth(clamp01(t / 0.8)) : smooth(clamp01(t / XFADE))).toFixed(3);
+    // 다음 장면과 글자가 겹치지 않도록, 장면이 끝나기 직전에 글자를 먼저 거둡니다
+    const end = i === lastIdx ? Infinity : s.len - 0.25;
+    for (const it of s.items) drawItem(it, t, end);
+    for (const m of s.marks) m.n.style.setProperty('--mk', easeOut(clamp01((t - m.at - 0.5) / 1.0)).toFixed(3));
+    for (const mv of s.moves) {
+      const e = reduceMotion ? (t >= mv.t ? 1 : 0) : easeOut(clamp01((t - mv.t) / 1.5));
+      mv.n.style.transform = `translateY(${(mv.d * (1 - e)).toFixed(2)}px)`;
     }
-    for (const a of s.adds) a.n.classList.toggle(a.c, t >= a.t);
-    if (!reduceMotion && t > -0.2 && t < s.len + 1.4) {
-      const p = Math.min(1, Math.max(0, t / (s.len + 1.2)));
+    if (!reduceMotion) {
+      const p = clamp01(t / (s.len + XFADE));
       for (const ph of s.photos) {
         let tf;
-        if (ph.kb === 'out') tf = `scale(${1.1 - 0.08 * p})`;
-        else if (ph.kb === 'left') tf = `scale(1.08) translate3d(${1.8 - 3.6 * p}%,0,0)`;
-        else if (ph.kb === 'right') tf = `scale(1.08) translate3d(${-1.8 + 3.6 * p}%,0,0)`;
-        else tf = `scale(${1.02 + 0.08 * p})`;
+        if (ph.kb === 'out') tf = `scale(${(1.1 - 0.08 * p).toFixed(4)})`;
+        else if (ph.kb === 'left') tf = `scale(1.08) translate3d(${(1.8 - 3.6 * p).toFixed(3)}%,0,0)`;
+        else if (ph.kb === 'right') tf = `scale(1.08) translate3d(${(-1.8 + 3.6 * p).toFixed(3)}%,0,0)`;
+        else tf = `scale(${(1.02 + 0.08 * p).toFixed(4)})`;
         ph.img.style.transform = tf;
       }
     }
@@ -560,27 +600,39 @@ function render(T) {
 }
 const fmt = x => { const s = Math.floor(x); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; };
 
+/* 배경음악 — 소리는 버튼을 누른 뒤에만 켜집니다 (브라우저 정책) */
+const bgm = document.getElementById('bgm');
+const btnSound = document.getElementById('btnSound');
+let soundOn = false;
+function startAudio() {
+  if (!soundOn) return;
+  try { bgm.currentTime = Math.min(T, bgm.duration || T); } catch (e) {}
+  bgm.play().catch(() => { soundOn = false; btnSound.textContent = '소리 켜기'; });
+}
+btnSound.addEventListener('click', () => {
+  soundOn = !soundOn;
+  btnSound.textContent = soundOn ? '소리 끄기' : '소리 켜기';
+  btnSound.setAttribute('aria-pressed', soundOn);
+  if (soundOn && playing) startAudio(); else bgm.pause();
+});
+
 /* 재생 제어 */
 let T = 0, playing = false, last = performance.now();
 function loop(now) {
+  if (exporting) return;
   if (playing) {
-    T += Math.min((now - last) / 1000, 0.1);
+    // 소리가 켜져 있으면 음악 시계에 맞춰 화면을 움직입니다
+    if (soundOn && !bgm.paused && bgm.readyState >= 2) T = bgm.currentTime;
+    else T += Math.min((now - last) / 1000, 0.1);
     if (T >= TOTAL) { T = TOTAL; playing = false; stage.classList.add('ended'); updateBtn(); }
   }
   last = now;
   render(T);
   requestAnimationFrame(loop);
 }
-function seek(x) {
-  stage.classList.add('reset');
-  T = x;
-  render(T);
-  void stage.offsetWidth;
-  requestAnimationFrame(() => requestAnimationFrame(() => stage.classList.remove('reset')));
-}
-function play() { if (T >= TOTAL) return replay(); playing = true; stage.classList.remove('paused', 'ended'); updateBtn(); }
-function pause() { playing = false; stage.classList.add('paused'); updateBtn(); }
-function replay() { stage.classList.remove('ended', 'paused'); seek(0); playing = true; updateBtn(); }
+function play() { if (T >= TOTAL) return replay(); playing = true; last = performance.now(); stage.classList.remove('paused', 'ended'); updateBtn(); startAudio(); }
+function pause() { playing = false; stage.classList.add('paused'); updateBtn(); bgm.pause(); }
+function replay() { stage.classList.remove('ended', 'paused'); T = 0; playing = true; last = performance.now(); updateBtn(); startAudio(); }
 function updateBtn() { btnPlay.textContent = playing ? '일시정지' : (T >= TOTAL ? '다시보기' : '재생'); }
 
 stage.addEventListener('click', e => {
@@ -598,13 +650,26 @@ document.addEventListener('keydown', e => {
 
 /* #scene5 처럼 링크 끝에 붙이면 해당 장면부터 재생 */
 const m = /^#scene(\d+)$/.exec(location.hash);
-const startAt = m && SCENES[+m[1] - 1] ? SCENES[+m[1] - 1].start : 0;
-seek(startAt);
+T = m && SCENES[+m[1] - 1] ? SCENES[+m[1] - 1].start : 0;
+render(T);
 requestAnimationFrame(loop);
 let started = false;
-const begin = () => { if (started) return; started = true; setTimeout(() => { playing = true; last = performance.now(); updateBtn(); }, 400); };
+const begin = () => { if (started || exporting) return; started = true; setTimeout(() => { if (!exporting) play(); }, 400); };
 (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(begin);
 setTimeout(begin, 2500);
+
+/* 영상 파일 추출용 (녹화 도구가 사용) */
+window.__reels = {
+  total: () => TOTAL,
+  scenes: () => SCENES.map(s => ({ id: s.id, start: s.start, len: s.len })),
+  exportMode() {
+    exporting = true; playing = false; bgm.pause();
+    document.body.classList.add('export');
+    frame.style.width = '1080px'; frame.style.height = '1920px';
+    stage.style.transform = 'none';
+  },
+  at(t) { render(t); },
+};
 
 /* ═══════════════════════════════════════════════════════
    4) 사진 넣기 패널
